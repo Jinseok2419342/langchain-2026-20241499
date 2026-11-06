@@ -9,3 +9,7 @@ __pycache__/
 # 에디터
 .vscode/
 .idea/
+
+# 미니 프로젝트 — 대용량 원본 PDF (68MB · 받는 법은 mini_project/CLAUDE.md «문서 받기»)
+mini_project/data/분리배출_QA사례100_2026.pdf
+mini_project/index*/
