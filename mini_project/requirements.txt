@@ -1,0 +1,16 @@
+# 버릴지도 — 분리배출 안내 RAG 슬랙 봇
+# 버전은 고정하지 않는다 (수업 저장소 관례). 확인된 버전은 README 5번 «확인된 환경».
+
+langchain
+langchain-core
+langchain-community
+langchain-ollama
+langchain-text-splitters
+langsmith
+python-dotenv
+
+pypdf                 # PDF Loader
+faiss-cpu             # 벡터 인덱스
+numpy
+
+slack_bolt            # Socket Mode 봇

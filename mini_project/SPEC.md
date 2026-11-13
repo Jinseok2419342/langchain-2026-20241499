@@ -154,7 +154,8 @@ mini_project/
 ├── .env.example         ← 루트 .env 에 있어야 할 키 **이름만** (값 없음 · `RECYCLE_*` 는 주석으로) — README 5번이 가리킴
 ├── index_recycle/       ← build_index.py 가 만듦 (.gitignore 의 `mini_project/index*/` 에 걸림 · 커밋 안 됨)
 ├── eval_results/        ← evaluate.py 결과 (md · json) — 커밋함
-└── docs/                ← LangSmith · 슬랙 캡처 이미지 (M5)
+├── tests/offline_check.py ← 모델 없이 코드 경로를 확인 (가짜 임베딩 · 가짜 LLM · 가짜 슬랙) — 13-1절
+└── docs/                ← 구성도(architecture.md · scenarios.md) + LangSmith · 슬랙 캡처 이미지 (M5)
 ```
 
 - `scratch_eval.py` 는 **그대로 둡니다** (CONTEXT 부록 C 의 재현 스크립트).
@@ -197,7 +198,8 @@ YEAR_BONUS = float(os.getenv("RECYCLE_YEAR_BONUS", "0"))   # ★ M4 에서 실�
 STRATEGY = os.getenv("RECYCLE_STRATEGY", "basic")          # basic | multiquery — M4 실측으로 기본값 결정
 
 TEMPERATURE, MAX_OUT, NUM_CTX = 0.1, 300, 4096
-KEEP_ALIVE = "30m"      # Ollama 가 모델을 5분 만에 내리지 않게 (첫 답 20초 문제)
+KEEP_ALIVE = 1800       # 초(30분) — Ollama 가 모델을 5분 만에 내리지 않게 (첫 답 20초 문제)
+                        # ⚠️ 정수로 — OllamaEmbeddings 의 keep_alive 는 int 만 받는다 ("30m" 은 ValidationError · 구현 때 확인)
 NOT_FOUND = "자료에서 찾지 못했습니다"
 MAX_QUESTION = 300
 TAG = "recycle-bot"
@@ -558,9 +560,9 @@ CONTEXT 는 «재질 소절 단위» 로 나누겠다고 했지만, 실제 추�
 |---|---|---|
 | `qa_case` | 100건 · 평균 151자 · 최대 423자 | **정확히 100건**, 장별 건수가 4-2절과 일치, 장마다 번호가 1..n 으로 빠짐없이, fallback 0쪽 |
 | `faq` | 36건 · 평균 106자 · 최대 218자 | **정확히 36건**, 모든 단위에 `A :` 줄이 있음 |
-| `item_dict` | 286건(제외 전) · 평균 20자 | 270건 이상, `ITEM_DROP` 제외 목록 출력 |
+| `item_dict` | 286건(제외 전) → `ITEM_DROP` 4건을 뺀 **282건** · 평균 20자 | 270건 이상, `ITEM_DROP` 제외 목록 출력 |
 | `guideline` | 38건 · 평균 295자 | 30건 이상 |
-| 합계 | 460 안팎 | — |
+| 합계 | **456** (구현 실측 · 제외 전 460) | — |
 
 추가 통과 조건
 
@@ -962,7 +964,7 @@ python evaluate.py answer --model gemma3:4b               # (선택) 수업 기�
 
 | 순서 | 바꾸는 것 | 고정 | 보는 숫자 |
 |---|---|---|---|
-| E1 | **분할** — 재귀 400/40 (`index_recursive` · 135청크) ↔ 구조 우선 (`index_recycle` · 460 안팎) | 같은 쪽 · 같은 정리 · 임베딩 KURE · basic · bonus 0 | Top-1 · Top-3 |
+| E1 | **분할** — 재귀 400/40 (`index_recursive` · 135청크) ↔ 구조 우선 (`index_recycle` · 456청크) | 같은 쪽 · 같은 정리 · 임베딩 KURE · basic · bonus 0 | Top-1 · Top-3 |
 | E2 | **검색 전략** — basic ↔ multiquery | 구조 인덱스 · bonus 0 | Top-3 (3회 범위) · 평균 시간 |
 | E3 | **`year_bonus`** — 0 · 0.5g · 1g · 2g | 구조 인덱스 · E2 에서 고른 전략 | Top-3 · 연도충돌 top-1 의 2026 수 · c1 |
 | E4 | **프롬프트** — 기존 ↔ «더 최근 근거를 따른다» 한 줄 추가 | E1~E3 채택 설정 | 생성 정답 수 · 자기모순 수 |
@@ -1128,7 +1130,7 @@ CONTEXT «범위 밖» 9항목은 그대로 유효합니다. 구현 중 유혹�
 | 7 | **임베딩 모델이 달라도 오류가 안 남** (둘 다 1024차원) | `manifest.json` 비교 |
 | 8 | 루트 `.env` 의 `EMBED_MODEL` · `MODEL` 을 바꾸면 다른 주차 실습이 깨짐 | `RECYCLE_*` 키와 코드 기본값만 |
 | 9 | `config` 보다 langchain 을 먼저 import → LangSmith 프로젝트 이름이 안 먹음 | 모든 파일 첫 import 가 `config` |
-| 10 | Ollama 가 안 쓰는 모델을 5분간 GPU 에 남김 / 5분 뒤 쓰는 모델을 내림 | 측정 전 `ollama ps` · `ollama stop` / `keep_alive="30m"` + 워밍업 |
+| 10 | Ollama 가 안 쓰는 모델을 5분간 GPU 에 남김 / 5분 뒤 쓰는 모델을 내림 | 측정 전 `ollama ps` · `ollama stop` / `keep_alive=1800`(초 · 정수) + 워밍업 |
 | 11 | 10주차 봇과 동시 실행 → 이벤트가 갈림 | 하나만 켠다 |
 | 12 | `year_bonus` 가 크면 다른 품목(은박 에어캡)이 올라옴 | 7장 실측으로 값 결정 |
 | 13 | 다시 쓰기 프롬프트 예시에 평가 문항을 넣음 → 점수가 부풀려짐 | 예시는 평가에 없는 품목으로 |
@@ -1166,5 +1168,33 @@ CONTEXT «범위 밖» 9항목은 그대로 유효합니다. 구현 중 유혹�
 | 18 | README 2번 «2026 을 앞세우고 사례집(2026) 기준이라고 밝힘» | 출처 줄의 연도 + 연도가 섞일 때 ℹ️ 안내 줄(6-2절). «앞세우는» 정도는 M4 실측으로 정한 `year_bonus` | 채택 결과에 따라 README 문구를 맞춤(9-3절) |
 | 19 ★ | CONTEXT «FAQ 36문항 — 평균 113자 · 최대 234자» | 시험 파서 평균 106자 · 최대 218자 (건수 36 은 같음) | 재질 소제목 줄 · «08. 분리배출 앱 FAQ» 줄을 뺀 차이로 보임. 구현 후 실측값으로 교체 |
 | 20 | 출처 예시가 두 문서에서 다름 — README 그림 «아이스팩 · 분리배출_가이드라인.pdf p.20» / CONTEXT 그림 «냉동팩 · 가이드라인 p.20» | 실제 출력 형식 하나로 통일 (16번) | 둘 다 구현 전 예시. M5 에서 실제 답을 복사해 양쪽을 같게 |
+
+### 13-1. 구현하며 이 명세와 달라진 점 (2026-11-13 · 코드가 기준)
+
+코드는 M1 ~ M4 분량을 **모델 없이** 작성했습니다(메인 PC 가 아니라 Ollama · 슬랙 · LangSmith 를 실행하지 못함). 아래는 명세 본문과 다르게 된 곳입니다.
+
+| # | 명세 본문 | 실제 코드 | 이유 |
+|---|---|---|---|
+| a | 3-2절 `KEEP_ALIVE = "30m"` | `1800` (초 · 정수) | `OllamaEmbeddings` 의 `keep_alive` 는 `int` 만 받음 — 문자열이면 `ValidationError` (langchain-ollama 1.1.0 에서 확인). 본문도 고침 |
+| b | 4-10절 품목사전 «286건(제외 전)» · 합계 460 | 인덱스에 들어가는 것은 **282건 · 합계 456청크** | `ITEM_DROP` 4건을 뺀 값. `--check` 가 «4건이 모두 걸렸는지» 도 검사 |
+| c | 4-1절 재귀 비교 인덱스 «평균 308자» | 135청크 · 평균 **307자** | `PyPDFLoader` 경로로 다시 잰 값 |
+| d | 5-3절 `fuse()` 하나 | `rewrite_queries()` · `candidates()` · `rank()` 로 나눔 (`fuse` 는 둘을 잇는 한 줄) | 평가에서 `year_bonus` 4가지를 **검색을 다시 하지 않고** 같은 후보 위에서 매기려고 |
+| e | 5-4절 프롬프트 후보 «한 줄 추가» 는 글로만 | `RAG_PROMPTS = {"base", "recent"}` + `RECYCLE_PROMPT` · `evaluate.py --prompt recent` | E4 를 코드 수정 없이 재려고. 기본은 `base`(`scratch_eval.py` 와 글자 단위로 같음) |
+| f | 7-2절 `evaluate.py` 옵션 | `--ids`(문항 고르기 · `scratch` = 10주차 6문항) · `--repeats` · `--no-multiquery` 추가 | 전후 비교 · 빠른 확인용 |
+| g | 7-1절 «30문항으로 늘릴 것» | `a1` ~ `a5` · `i2` 6개 추가 → **30문항** (표준 8 · 생활용어 8 · 연도충돌 4 · 품목사전 4 · 범위밖 4 · 입력검증 2) | `python questions.py` 가 `gold` 가 구조 · 재귀 두 분할의 실제 청크에 있는지 검사 — 통과 |
+| h | 3-1절 파일 목록 | `tests/offline_check.py` · `docs/architecture.md` · `docs/scenarios.md` 추가 | 모델 없이 코드 경로를 확인하는 검사 · 구성도 |
+| i | 6-2절 근거 줄 | 같은 출처가 겹치면 **한 번만** 표시 | 본문 청크 둘이 같은 쪽 · 같은 소절이면 출처 문자열이 같음 |
+| j | 6-1절 검색 모드 | trace 이름 `recycle-search` · 태그 `search` 로 추적에 남김 | 검색 모드도 슬랙 입력이라 |
+
+**검증한 것 / 못 한 것**
+
+| 검증함 (모델 없이) | 아직 못 함 (메인 PC 에서) |
+|---|---|
+| `build_index.py --check` 15항목 — 실제 PDF | 임베딩 · 인덱스 저장을 실제 KURE-v1 로 |
+| `questions.py` — `gold` 36개가 실제 청크에 있음 (구조 · 재귀 두 분할 모두) | 검색 Top-1 · Top-3 · 생성 정답 수 (전부 미측정) |
+| `tests/offline_check.py` 41항목 — 가짜 임베딩 · 가짜 LLM · 가짜 슬랙 클라이언트로 검색기 · trace 모양 · 슬랙 갈래 전부 · 평가 스크립트 | 실제 슬랙 왕복 · 실제 LangSmith 화면 · VRAM · 답 시간 |
+| `ChatOllama` · `OllamaEmbeddings` 생성자 인자가 실제 클래스에서 받아들여짐 | 모델이 «찾지 못했습니다» · 지시 바꾸기 거절을 실제로 하는지 |
+
+`config.STRATEGY` · `YEAR_BONUS` 기본값은 **`basic` · `0`** 그대로입니다 — 7-3절 실측 전에는 바꾸지 않습니다.
 
 이 밖에 CONTEXT.md · README.md 에는 편집 중 줄이 섞여 깨진 곳이 있었고(«위험과 대응» 표 · 부록 C 끝 · README 3번 끝 문장 · «필수 요건 대조» 제목), 이 명세서와 함께 복구했습니다. CONTEXT.md 는 고친 자리에 HTML 주석(«복구 메모»)으로 무엇을 어떻게 고쳤는지 남겼고, README.md 는 원래 글이 분명해 표시 없이 되돌렸습니다. **되살리지 못한 것은 한 곳** — CONTEXT 부록 C «실제 답 비교» 표의 «마트 영수증» 행 A.X 답 뒷부분입니다(M2 에서 `scratch_eval.py` 를 다시 돌려 채울 것).
