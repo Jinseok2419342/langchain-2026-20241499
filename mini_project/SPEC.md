@@ -2,7 +2,7 @@
 
 > 이 문서는 **구현을 맡은 AI(또는 사람)가 이 문서만 보고 코드를 끝까지 만들 수 있게** 쓴 작업 지시서입니다.
 > 채점 대상 명세는 [README.md](README.md) · [CONTEXT.md](CONTEXT.md) 이고, 이 문서는 그 둘을 **코드 수준으로 풀어 쓴 것**입니다.
-> 작성 2026-11-13. 이 문서의 «실측» 은 같은 날 이 PC 에서 두 PDF 에 시험 파서를 **읽기 전용으로** 돌려 얻은 값입니다(코드 파일은 아직 없음).
+> 작성 2026-11-13. 이 문서의 «실측» 은 같은 날 두 PDF 에 시험 파서를 **읽기 전용으로** 돌려 얻은 값입니다(코드 파일은 아직 없음).
 
 ---
 
@@ -15,7 +15,7 @@
 | 1 | 수업 자료 `11-06/2교시_분할_메타데이터와_프로젝트_착수.pdf` §4 | **필수 요건** — 어기면 감점 (아래 1장에 전부 옮김) |
 | 2 | [README.md](README.md) · [CONTEXT.md](CONTEXT.md) | 채점 대상 명세 — 기능 · 모델 · 설계 약속 |
 | 3 | 이 문서 (SPEC.md) | 구현 방법 — 2번과 다르게 정한 곳은 **13장에 이유와 함께** 적음 |
-| 4 | [CLAUDE.md](CLAUDE.md) | 작업 메모 — 13장에 적힌 3곳은 현재 사실과 다름 |
+| 4 | [CLAUDE.md](CLAUDE.md) | 인수인계 요약 · 현재 상태 — 2026-11-13 에 이 명세에 맞춰 갱신함. 어긋나면 이 문서가 우선 |
 
 2번과 3번이 어긋나면 **멋대로 한쪽을 따르지 말고** 13장을 확인한 뒤, 거기 없으면 사용자에게 물을 것.
 
@@ -50,23 +50,34 @@
 | R1 | **슬랙으로 묻고 슬랙으로 답한다** — 입구 · 출구는 슬랙. 터미널에서만 돌면 요건 미충족 (§4-2 · §4-3) | 채널 `@멘션` 과 DM 으로 질문 → **같은 스레드에** 답 | 슬랙에서 실제 왕복 1회 이상 + 화면 캡처 (M3) |
 | R2 | 받는 방식은 `slack_bolt` · **Socket Mode** (§4-2) | 10주차 `slack_rag_bot.py` 구조 유지 | 코드 |
 | R3 | 처리는 **RAG 또는 MCP** 하나 이상 (§4-2) | **RAG** — 검색한 근거로 답하고 출처 표시 | 답 밑에 📚 근거가 붙음 |
-| R4 | **LangChain 기반 구현** (§4-2) | Loader · Splitter · Embeddings · VectorStore · Retriever · LCEL 체인 전부 LangChain 구성요소 | 6장 표의 구성요소가 코드에 있음 |
+| R4 | **LangChain 기반 구현** (§4-2) | Loader · Splitter · Embeddings · VectorStore · Retriever · LCEL 체인 전부 LangChain 구성요소 | README 4번 «LangChain» 표의 ① ~ ⑥ 구성요소가 코드에 있음 |
 | R5 | **LangSmith 추적 적용** (§4-2) + 14주차 **추적 캡처 제출(필수)** | 질문 1건 = trace 1건, 검색 · 생성이 자식 run, 전처리도 추적 | LangSmith 화면 캡처 (8장) |
-| R6 | **VRAM 8GB 에서 실제로 동작** — 설계만 하지 말고 돌려 볼 것 (§4-2) | 두 모델 동시 구동 + 봇이 답하는 동안 `nvidia-smi` 8GB 미만 | M3 에서 이 PC 로 다시 측정 |
-| R7 | 토큰은 **루트 `.env` 에만** — 코드 · 커밋 금지 (§4-2) | `SLACK_BOT_TOKEN` · `SLACK_APP_TOKEN` · `LANGSMITH_API_KEY` 를 코드에 적지 않음 | `git grep -n "xoxb-\|xapp-\|lsv2_"` 결과 없음 |
+| R6 | **VRAM 8GB 에서 실제로 동작** — 설계만 하지 말고 돌려 볼 것 (§4-2) | 두 모델 동시 구동 + 봇이 답하는 동안 `nvidia-smi` 8GB 미만 | M3 에서 개발 PC(RTX 3070 8GB)로 다시 측정 |
+| R7 | 토큰은 **루트 `.env` 에만** — 코드 · 커밋 금지 (§4-2) | `SLACK_BOT_TOKEN` · `SLACK_APP_TOKEN` · `LANGSMITH_API_KEY` 를 코드에 적지 않음 | 표 아래 «토큰 누출 검사» 명령의 출력이 없음 |
 | R8 | 14주차 제출물 = **코드 + README.md + LangSmith 추적 캡처** (§4-2) | README 5번(실행 방법)은 **그대로 따라 하면 되는** 수준 (§4-4) | 9장 |
 | R9 | 모델 선택 근거 — 품질 · 속도 · 비용 · 보안 · 오프라인 · VRAM 중 무엇인지 (§4-3) | README 3번에 이미 있음. 구현 후 수치가 바뀌면 갱신 | 9장 |
 | R10 | 피할 것 — 12B 이상 모델 / 대량 크롤링 · 대규모 인덱싱 / 상용 API 상시 호출 / 범위 없는 챗봇 (§4-3) | 7B + 0.6B · PDF 2건 · 전부 로컬 · 분리배출 한정 | 11장 «범위 밖» 을 코드가 지킴 |
-| R11 | 분할 단계에서 메타데이터를 심는다 — 출처 표기 · 필터 · 운영용, `splitter` 필드 권장, 타입 맞추기 (§2-2 · §2-3) | 4-7절의 메타데이터 표대로. `year` 는 **int** | `build_index.py --show` 출력 |
+| R11 | 분할 단계에서 메타데이터를 심는다 — 출처 표기 · 필터 · 운영용, `splitter` 필드 권장, 타입 맞추기 (§2-2 · §2-3) | 4-8절의 메타데이터 표대로. `year` 는 **int** | `build_index.py --show` 출력 |
 | R12 | 일정 — **13주차 11/27 중간 점검**, **14주차 12/4 최종 제출**. 발표 없음 — README 가 곧 점수 (§4-1) | M3 까지를 11/27 전에, M5 를 12/4 전에 | 10장 |
+| R13 | 권장 방향 — **특정 문서 도메인 QA 봇** (RAG · 10~11주차): 슬랙에서 «근거와 함께 답» (§4-3) | 이 유형 그대로. 답마다 📚 근거(품목 · 문서 · 연도 · 쪽) | 6-2절 |
+| R14 | MCP(도구 호출)를 쓰면 모델부터 확인 — `gemma3:4b` 는 도구 호출 미지원 (§4-2) | **해당 없음** — MCP 를 쓰지 않음 | 11장 |
 
 배점: 명세 2%(10주차 · 제출 완료) + **구현 완성도 4%** + **문서화 품질 2%**.
+
+**토큰 누출 검사 (R7)** — 새 파일을 `git add` 한 뒤, 커밋 전에 실행합니다. 아무것도 나오지 않아야 합니다.
+
+```powershell
+git grep -nIE "xox[abp]-[0-9A-Za-z-]{20,}|xapp-[0-9]-[0-9A-Za-z-]{20,}|lsv2_[a-z]{2}_[0-9a-f]{20,}|sk-[0-9A-Za-z_-]{20,}"
+git status --short      # .env 가 목록에 없어야 함
+```
+
+접두어만 찾으면(`xoxb-`) 안 됩니다 — 봇 코드의 접두어 검사(`startswith("xoxb-")`)와 안내 문구가 걸려 «결과 없음» 을 만들 수 없습니다. 위 식은 **실제 토큰 모양**만 잡습니다(2026-11-13 현재 저장소에서 출력 없음 확인).
 
 ---
 
 ## 2. 환경 · 사전 준비 (M0)
 
-### 2-1. 확인된 환경 (2026-11-13 이 PC)
+### 2-1. 확인된 환경 (2026-11-13 · 개발 PC)
 
 | 항목 | 값 |
 |---|---|
@@ -81,7 +92,13 @@
 
 ### 2-2. ⚠️ 먼저 해야 할 일 — 지금 상태로는 안 돕니다
 
-1. **모델 2개가 이 PC 의 Ollama 에 없습니다.** `ollama list` 에는 `qwen3-embedding:0.6b` · `gemma3:4b` · `exaone3.5:2.4b` 만 있습니다.
+0. **gitignore 된 것은 클론에 따라오지 않습니다** — `venv/` · 루트 `.env` · `index*/` · 사례집 PDF. 시작 전에 있는지 확인하고, 사례집 PDF 가 없으면 CLAUDE.md «문서 받기» 명령으로 받습니다.
+
+   ```powershell
+   Test-Path ..\.env, ..\venv\Scripts\python.exe, "data\분리배출_QA사례100_2026.pdf"   # True True True
+   ```
+
+1. **모델 2개가 개발 PC 의 Ollama 에 없습니다.** `ollama list` 에는 `qwen3-embedding:0.6b` · `gemma3:4b` · `exaone3.5:2.4b` 만 있습니다.
 
    ```powershell
    ollama pull hf.co/mykor/A.X-4.0-Light-gguf:Q4_K_M     # 생성 · 4.4 GB
@@ -106,6 +123,7 @@
 4. **GPU 비우기** — `ollama ps` 로 확인하고 안 쓰는 모델은 `ollama stop <모델>`. (`qwen3-embedding:0.6b` 가 같이 떠 있으면 약 +2.4GB)
 
 5. 슬랙 앱 설정은 9 · 10주차 것을 그대로 씁니다 — Socket Mode 켜짐, 이벤트 `app_mention` · `message.im` 구독, 권한 `app_mentions:read` · `chat:write` · `im:history`. 봇이 답을 안 하면 `11-06/slack_bot_mode/` 봇(또는 `10-30/socket_hello.py`)으로 슬랙 쪽부터 확인.
+   README 의 예시는 `@버릴지도` 입니다. 슬랙 앱의 표시 이름이 다르면 **사용자가** 슬랙 앱 설정(App Home → Display Name)에서 바꿉니다 — 코드는 멘션을 `<@U…>` ID 로 받으므로 이름과 무관하게 동작합니다.
 
 ### 2-3. 실행 위치
 
@@ -133,6 +151,7 @@ mini_project/
 ├── questions.py         ← M4 · 평가 문항
 ├── evaluate.py          ← M4 · 검색 · 생성 실측 (CONTEXT 부록 갱신용)
 ├── requirements.txt     ← 설치 목록
+├── .env.example         ← 루트 .env 에 있어야 할 키 **이름만** (값 없음 · `RECYCLE_*` 는 주석으로) — README 5번이 가리킴
 ├── index_recycle/       ← build_index.py 가 만듦 (.gitignore 의 `mini_project/index*/` 에 걸림 · 커밋 안 됨)
 ├── eval_results/        ← evaluate.py 결과 (md · json) — 커밋함
 └── docs/                ← LangSmith · 슬랙 캡처 이미지 (M5)
@@ -156,7 +175,7 @@ os.environ["LANGSMITH_PROJECT"] = os.getenv("RECYCLE_LANGSMITH_PROJECT", "recycl
 
 HERE = Path(__file__).resolve().parent
 DATA_DIR = HERE / "data"
-INDEX_DIR = HERE / "index_recycle"
+INDEX_DIR = HERE / os.getenv("RECYCLE_INDEX", "index_recycle")   # 평가에서 비교용 인덱스로 바꿀 때만 (7-2절)
 
 MODEL = os.getenv("RECYCLE_MODEL", "hf.co/mykor/A.X-4.0-Light-gguf:Q4_K_M")
 EMBED_MODEL = os.getenv("RECYCLE_EMBED_MODEL", "hf.co/mykor/KURE-v1-gguf:Q8_0")
@@ -169,7 +188,7 @@ DOCS = [   # (파일, year, 출처에 쓸 짧은 이름)
 CHUNK_SIZE, CHUNK_OVERLAP = 400, 40
 KO_SEPARATORS = ["\n\n", "\n", "다. ", ". ", " ", ""]
 UNIT_MAX = 600          # 구조 단위(Q&A · FAQ · 품목)는 이 길이를 넘을 때만 재귀로 다시 자른다
-MIN_BODY_CHARS = 30     # 가이드라인 **본문** 청크에만 적용 (품목사전에 걸면 안 됨 — 4-5절)
+MIN_BODY_CHARS = 30     # 가이드라인 **본문** 청크에만 적용 (품목사전에 걸면 안 됨 — 4-6절)
 
 TOP_K = 3               # 근거로 넘길 청크 수
 FETCH_K = 10            # 재정렬 전에 넓게 가져올 후보 수
@@ -186,6 +205,8 @@ TAG = "recycle-bot"
 
 - 값은 CONTEXT 에서 정한 그대로입니다(400/40 · k=3 · temperature 0.1 · context 4096). `MAX_OUT=300` 은 `scratch_eval.py` 에서 검증된 값.
 - LangSmith 는 환경 변수를 처음 읽을 때 캐시합니다. **`config` 를 langchain · langsmith 보다 먼저 import** 해야 프로젝트 이름이 먹습니다.
+- `RECYCLE_*` 는 «실행 한 번 = 설정 하나» 입니다. `get_store()` · `get_llm()` 이 `lru_cache` 라 실행 중에는 바뀌지 않습니다.
+- 생성 모델에 문제가 생기면 `RECYCLE_MODEL=exaone3.5:2.4b` 로 바꿔 실행합니다(CONTEXT «위험과 대응» 의 대체 모델). 임베딩은 그대로라 **인덱스를 다시 만들 필요가 없습니다.**
 
 ### 3-3. `requirements.txt`
 
@@ -204,6 +225,9 @@ slack_bolt
 ```
 
 버전은 고정하지 않습니다(수업 저장소 관례). 확인된 버전은 2-1절 표를 README 5번에 «확인된 환경» 으로 옮깁니다.
+
+- **글자 수는 재는 방법에 따라 조금 다릅니다** (실측 · pypdf 6.21.4): `pypdf` 를 직접 부르면 가이드라인 28,080자 · 사례집 25,138자, `PyPDFLoader` 로 읽으면 28,055자 · 25,135자(쪽 끝 공백을 떼어 줌). pypdf 7.0.1 은 28,113자.
+  줄 단위로 `strip` 한 뒤의 내용은 **완전히 같아서** 구조 단위 수(Q&A 100 · FAQ 36 · 품목 286 · 본문 38)는 어느 쪽이든 같습니다. 이 문서의 글자 수는 `pypdf` 직접 호출 값입니다 — 구현은 `PyPDFLoader` 를 쓰므로 문서에 옮길 때는 구현 출력값을 씁니다.
 
 ---
 
@@ -224,7 +248,12 @@ python build_index.py --show              # 임베딩 없이 요약표 + 구역�
 python build_index.py --show qa_case      # 한 구역 전체를 한 줄씩 — 눈 확인용 (qa_case | faq | item_dict | guideline)
 python build_index.py                     # 인덱스 생성 → index_recycle/
 python build_index.py --mode recursive --out index_recursive   # 비교 기준(구조 분할 없이 재귀만) — M4 의 분할 A/B 용
+python build_index.py --check             # 4-10절 수용 기준을 assert 로 검사 (임베딩 없음 · 실패하면 종료 코드 1)
 ```
+
+**`--mode recursive` 의 정의** — 분할 **하나만** 다르게 합니다. 구조 모드와 **같은 쪽**(4-2절에서 버리지 않는 쪽: 가이드라인 3~25 · 28~34쪽 30개 + 사례집 Q&A 쪽 29개)을 **같은 정리**(4-3절)로 다듬은 뒤, 쪽마다 줄을 `\n` 으로 이어 `RecursiveCharacterTextSplitter(400, 40, KO_SEPARATORS)` → 30자 미만 버림.
+메타데이터는 `source` · `page` · `year` · `doc_type`(쪽 범위로) · `chunk_id` · `splitter="recursive-400-40"` 만 (`item` · `material` · `qa_date` · `section` 없음). 실측 기대값: **135청크 · 평균 308자**.
+`--out <폴더 이름>` 은 `mini_project/` 아래에 만듭니다(`index` 로 시작해야 gitignore 에 걸림).
 
 ### 4-2. 구역 지도 (실측)
 
@@ -233,11 +262,11 @@ python build_index.py --mode recursive --out index_recursive   # 비교 기준(�
 | 쪽 | 내용 | 처리 | `doc_type` |
 |---|---|---|---|
 | 1 · 2 | 표지 · 목차 | 버림 | — |
-| 3 ~ 20 | 본문 1~7장 | 쪽 단위 → 재귀 400/40 (4-6절) | `guideline` |
-| 21 ~ 25 | 8장 앱 FAQ | «Q :» 1개 = 1청크 (4-4절) | `faq` |
+| 3 ~ 20 | 본문 1~7장 | 쪽 단위 → 재귀 400/40 (4-7절) | `guideline` |
+| 21 ~ 25 | 8장 앱 FAQ | «Q :» 1개 = 1청크 (4-5절) | `faq` |
 | 26 | 9장 과태료 기준표 | **버림** (범위 밖 — 표가 숫자 나열로 풀림) | — |
 | 27 | 품목사전 이용법 · 구분마크 설명 | 버림 (아이콘 설명 조각) | — |
-| 28 ~ 34 | 부록 품목사전 | 품목 1개 = 1청크 (4-5절) | `item_dict` |
+| 28 ~ 34 | 부록 품목사전 | 품목 1개 = 1청크 (4-6절) | `item_dict` |
 | 35 · 36 | 뒷표지 · 빈 쪽 | 버림 | — |
 
 **문서 ② 사례집 (52쪽 · 25,138자 · `year=2026`)**
@@ -245,15 +274,15 @@ python build_index.py --mode recursive --out index_recursive   # 비교 기준(�
 | 쪽 | 내용 | 처리 |
 |---|---|---|
 | 1 ~ 5 | 표지 · 서문 · 앱 소개 · 목차 | 버림 |
-| 6 ~ 46 | **장 구분쪽 12개** + **Q&A 쪽 29개** | 장 구분쪽 → 장 이름 · 품목 목록만 읽고 버림 / Q&A 쪽 → 1건 = 1청크 (4-3절) · `doc_type=qa_case` |
+| 6 ~ 46 | **장 구분쪽 12개** + **Q&A 쪽 29개** | 장 구분쪽 → 장 이름 · 품목 목록만 읽고 버림 / Q&A 쪽 → 1건 = 1청크 (4-4절) · `doc_type=qa_case` |
 | 47 ~ 52 | 협회 부서 · 회원사 · 회비 안내 · 판권 | 버림 |
 
 장 구분쪽 (쪽 · 장 이름 · 건수) — 합계 **100**:
 6 종이·종이컵 10 / 10 종이팩 3 / 12 무색페트병 4 / 14 플라스틱류 10 / 18 비닐류 10 / 22 발포합성수지 4 / 24 유리·유리병 5 / 27 금속류 8 / 30 의류·잡화 7 / 33 전기전자제품 10 / 37 음식물 10 / 41 기타 19
 
-### 4-3. 정리 규칙 — 머리말 정규식 ⚠️ CLAUDE.md 의 정규식을 쓰지 말 것
+### 4-3. 정리 규칙 — 머리말 정규식 ⚠️ `scratch_eval.py` 의 정규식을 쓰지 말 것
 
-CLAUDE.md «함정 3» 의 정규식(`scratch_eval.py` 의 `HDR`)에는 실측으로 확인된 문제가 둘 있습니다.
+`scratch_eval.py` 의 `HDR` 정규식(예전 CLAUDE.md 가 «검증됨» 이라 적었던 것)에는 실측으로 확인된 문제가 둘 있습니다.
 
 1. 가이드라인 머리말의 **절반은 줄 앞에 공백이 있습니다**(`␣재활용품 분리배출 3␣`). 기존 정규식은 `^` 바로 뒤에 글자를 요구해 이 꼴을 못 잡습니다.
    실측: 머리말 34줄 중 **17줄만 지우고 17줄이 남습니다** (남는 쪽: 3 · 5 · 7 · 9 · 11 · 13 · 15 · 17 · 18 · 20 · 22 · 24 · 26 · 28 · 30 · 32 · 34).
@@ -306,7 +335,7 @@ HDR_Q = re.compile(r"^[ \t]*(?:2026[넌년]도 내 손안의 분리배출 앱|Q&
    점수 = `10 × LCS(품목명, 질문) + LCS(품목명, 답)`. `LCS` = 한글 · 영문 · 숫자만 남긴 뒤의 **최장 공통 부분 문자열 길이**, 품목명은 `item` 과 라벨 중 큰 쪽.
 10. 한 쪽에서 메타 수 ≠ Q&A 수이면 그 쪽은 **재귀 400/40 으로 fallback** 하고 경고를 출력 (인덱스는 만들어짐).
 
-**참고 구현** — 아래 코드는 2026-11-13 실제 PDF 에 돌려 **100건 · 경고 0 · 장별 건수 일치 · 번호 누락/중복 없음**을 확인했고, 100건의 (품목 ↔ 질문) 짝을 눈으로 한 번 훑어 확인했습니다. 그대로 써도 되고 고쳐도 되지만, 고치면 4-8절 수용 기준을 다시 통과시킬 것.
+**참고 구현** — 아래 코드는 2026-11-13 실제 PDF 에 돌려 **100건 · 경고 0 · 장별 건수 일치 · 번호 누락/중복 없음**을 확인했고, 100건의 (품목 ↔ 질문) 짝을 눈으로 한 번 훑어 확인했습니다. 그대로 써도 되고 고쳐도 되지만, 고치면 4-10절 수용 기준을 다시 통과시킬 것. (필요한 import: `re` · `itertools` · `from difflib import SequenceMatcher`, 그리고 4-3절의 `HDR_Q`)
 
 ```python
 DATE = re.compile(r"(20\d\d-\d\d-\d\d)\s*$")
@@ -475,8 +504,8 @@ CONTEXT 는 «재질 소절 단위» 로 나누겠다고 했지만, 실제 추�
 | 19 | `6. 유해폐기물` | `유해폐기물` |
 | 20 | `7. 가연성폐기물 및 불연성폐기물 / 기타폐기물` | — |
 
-- 쪽마다 `HDR_G` 제거 → 빈 줄 제거 → `RecursiveCharacterTextSplitter(400, 40, KO_SEPARATORS)` → `MIN_BODY_CHARS`(30자) 미만 버림.
-- 실측: **38청크** · 평균 294자.
+- 쪽마다 `HDR_G` 제거 → 줄마다 앞뒤 공백 제거 · 빈 줄 제거 → `\n` 으로 이음 → `RecursiveCharacterTextSplitter(400, 40, KO_SEPARATORS)` → `MIN_BODY_CHARS`(30자) 미만 버림.
+- 실측: **38청크** · 평균 295자.
 - 한 쪽에 재질이 둘 이상이면 `material` 을 넣지 않습니다(틀린 값보다 없는 값).
 
 ### 4-8. 메타데이터 — 구역별로 넣는 키
@@ -500,7 +529,9 @@ CONTEXT 는 «재질 소절 단위» 로 나누겠다고 했지만, 실제 추�
 
 ### 4-9. 함수 구성 · 추적 · 저장
 
-```python
+아래는 **함수 목록(시그니처 요약)** 입니다 — 한 줄에 줄여 쓴 것이라 그대로는 실행되지 않습니다.
+
+```text
 @traceable(name="clean-pages")        def clean_pages(pages, kind) -> list[Document]   # 머리말 제거 · 쪽 범위 선택
 @traceable(name="split-qa-cases")     def split_qa_cases(pages) -> list[Document]
 @traceable(name="split-faq")          def split_faq(pages) -> list[Document]
@@ -516,6 +547,8 @@ CONTEXT 는 «재질 소절 단위» 로 나누겠다고 했지만, 실제 추�
 - **`manifest.json`** 을 인덱스 폴더에 함께 씁니다: `{"embed_model", "mode", "chunks", "by_doc_type", "built_at"}`.
   ⚠️ `qwen3-embedding:0.6b` 와 KURE-v1 은 **둘 다 1024차원**이라, 인덱스를 만든 모델과 다른 모델로 검색해도 **오류 없이 엉뚱한 결과**가 나옵니다. 읽는 쪽(5장)이 manifest 의 `embed_model` 을 비교해 다르면 멈춥니다.
 - 저장 뒤 되읽기 확인 1회: `load_index` → `"선글라스 버리는 법"` 으로 `k=1` 검색 → `item` · `page` 출력.
+- PDF 가 `data/` 에 없으면 어느 파일이 없는지와 받는 법(CLAUDE.md «문서 받기»)을 알리고 `SystemExit`. 10주차처럼 자동으로 내려받지 않습니다(68MB).
+- `--check` 는 4-10절의 조건 중 기계로 볼 수 있는 것(구역별 건수 · 장별 건수와 번호 · FAQ 의 `A :` 줄 · 필수 키와 `year` 타입 · `None`/빈 값 · 남은 머리말 0)을 `assert` 로 검사합니다. 파서를 고칠 때마다 돌리는 회귀 검사입니다.
 
 ### 4-10. `--show` 출력과 수용 기준 (M1)
 
@@ -526,11 +559,12 @@ CONTEXT 는 «재질 소절 단위» 로 나누겠다고 했지만, 실제 추�
 | `qa_case` | 100건 · 평균 151자 · 최대 423자 | **정확히 100건**, 장별 건수가 4-2절과 일치, 장마다 번호가 1..n 으로 빠짐없이, fallback 0쪽 |
 | `faq` | 36건 · 평균 106자 · 최대 218자 | **정확히 36건**, 모든 단위에 `A :` 줄이 있음 |
 | `item_dict` | 286건(제외 전) · 평균 20자 | 270건 이상, `ITEM_DROP` 제외 목록 출력 |
-| `guideline` | 38건 · 평균 294자 | 30건 이상 |
+| `guideline` | 38건 · 평균 295자 | 30건 이상 |
 | 합계 | 460 안팎 | — |
 
 추가 통과 조건
 
+- [ ] `python build_index.py --check` 가 통과 (종료 코드 0)
 - [ ] `--show qa_case` 100줄을 **사람이 눈으로** 훑어 품목과 질문이 맞는지 확인 (특히 15 · 16 · 17 · 19 · 20 · 21 · 23쪽)
 - [ ] 모든 청크에 `source` · `page` · `year` · `doc_type` · `chunk_id` · `splitter` 가 있고 `year` 가 `int`
 - [ ] metadata 값에 `None` · 빈 문자열이 없음
@@ -559,7 +593,9 @@ CONTEXT 는 «재질 소절 단위» 로 나누겠다고 했지만, 실제 추�
 
 ### 5-2. 공개 함수 (슬랙 봇 · 평가 스크립트가 쓰는 것)
 
-```python
+함수 목록(시그니처 요약)입니다.
+
+```text
 get_store() -> FAISS                    # lru_cache — 인덱스는 한 번만 읽는다. manifest 검사 포함
 get_llm() -> ChatOllama                 # lru_cache — ChatOllama(model=MODEL, temperature=TEMPERATURE,
                                         #              num_predict=MAX_OUT, num_ctx=NUM_CTX, keep_alive=KEEP_ALIVE)
@@ -577,7 +613,7 @@ warmup() -> float                        # 두 모델을 GPU 에 올린다 — �
 **`get_store()`**
 
 - `OllamaEmbeddings(model=EMBED_MODEL, keep_alive=KEEP_ALIVE)` 로 `faiss_io.load_index(INDEX_DIR, emb)`.
-- 인덱스가 없으면 `SystemExit("인덱스가 없습니다 → python build_index.py")`.
+- 인덱스가 없으면(`load_index` 가 `None` 을 돌려줌) `SystemExit("인덱스가 없습니다 → python build_index.py")`.
 - `manifest.json` 의 `embed_model` 이 `EMBED_MODEL` 과 다르면 `SystemExit` — 차원이 같아 조용히 틀리는 사고를 막는 유일한 장치입니다(4-9절).
 
 ### 5-3. 검색 — 기본 · MultiQuery · `year` 최신 우선
@@ -596,9 +632,17 @@ warmup() -> float                        # 두 모델을 GPU 에 올린다 — �
 - **`year_bonus` 를 «필터» 가 아니라 «보정» 으로 한 이유**: 2018 가이드라인에만 있는 품목(나무젓가락 · 핫팩 · 형광등 …)이 많습니다. `year >= 2020` 으로 걸러 버리면 그 답을 잃습니다.
 - ⚠️ **부작용이 실제로 있습니다** — «뽁뽁이» 의 정답은 2018 문서(«비닐류로 배출»)인데, 2026 사례집에는 **«은박 에어캡(뽁뽁이)»** 라는 **다른 품목**이 있습니다. `year_bonus` 가 크면 이쪽이 위로 올라옵니다. 그래서 값은 추측으로 정하지 않고 7장 실측으로 정합니다.
 
-**참고 구현** — 아래 구조는 2026-11-13 가짜 임베딩 · 가짜 LLM 으로 돌려 «trace 1건 안에 Retriever(그 안에 다시 쓰기 LLM) 와 생성 체인이 나란히 찍히는 것» 과 «원본 docstore 의 metadata 가 바뀌지 않는 것» 을 확인했습니다. 실제 모델로는 아직 돌리지 않았습니다.
+**참고 구현** — 아래 구조는 2026-11-13 가짜 임베딩 · 가짜 LLM 으로 돌려 «trace 1건 안에 Retriever(그 안에 다시 쓰기 LLM) 와 생성 체인이 나란히 찍히는 것» 과 «원본 docstore 의 metadata 가 바뀌지 않는 것» 을 확인했습니다(문서의 이 코드 블록을 그대로 뽑아 다시 실행 · langchain-core 1.8.0). 실제 모델로는 아직 돌리지 않았습니다.
 
 ```python
+import re
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.runnables import RunnableLambda
+
 REWRITE_PROMPT = PromptTemplate.from_template(
     "당신은 분리배출 문서 검색 도우미입니다. 반드시 한국어로 작성하세요.\n"
     "사용자의 질문을 보고, 환경부 분리배출 가이드라인과 분리배출 Q&A 사례집에서 근거를 찾기 위한 검색 질문 3개를 만드세요.\n"
@@ -778,6 +822,8 @@ python rag_backend.py --strategy multiquery --year-bonus 0.05 "생수병은 어�
 | `@버릴지도` (내용 없음) | — | 사용법 안내 |
 | 300자 초과 | — | «✋ 질문은 300자 이내로 부탁드립니다. (지금 N자)» |
 
+**답하는 자리 (R1 «같은 스레드에 답을 단다»)** — 모든 메시지를 `thread_ts = event.get("thread_ts") or event["ts"]` 로 보냅니다. 채널 멘션이면 그 메시지 아래 스레드에, 스레드 안에서 멘션하면 그 스레드에, **DM 도** 질문 메시지의 스레드에 답합니다(10주차 코드 그대로 — 채널 본문에 새 메시지로 답하지 않습니다).
+
 `parse(text) -> (mode, question)` — 맨 앞 `<@U…>` 를 떼고 첫 단어가 `검색/search` · `비교/vs` 인지 봅니다. **`openai` 분기 · `BACKENDS` · `ALLOWED` · `SLACK_ALLOWED_USERS` 는 삭제**합니다.
 
 ### 6-2. 답 메시지 형식
@@ -791,6 +837,8 @@ _— rag · A.X-4.0-Light · 0.6초_
 
 - `is_not_found(답)` 이면 **근거 줄을 붙이지 않고** 고정 문구로 바꿉니다(관련 없는 근거를 보여 주면 오해를 삼):
   `자료에서 찾지 못했습니다 — 지역별 배출 요일 · 수수료처럼 지자체마다 다른 내용은 거주지 구청(주민센터)에 확인하세요.`
+- 근거 3개에 **2018 문서와 2026 문서가 섞여 있으면** 근거 줄 아래에 한 줄을 덧붙입니다 (README 2번 «2026 을 앞세우고 사례집(2026) 기준이라고 밝힘»):
+  `ℹ️ 2018 가이드라인과 2026 사례집이 함께 근거로 쓰였습니다 — 내용이 다르면 최신인 사례집(2026)을 따르세요.`
 - 비교 모드는 10주차처럼 `🙈 *RAG 없이* (모델 기억만)` / `📖 *RAG 로* (문서에서 찾아서)` 머리말을 붙입니다.
 - 꼬리 줄의 모델 이름은 짧게(`MODEL` 에서 `hf.co/…/` 와 `-gguf:…` 를 뗀 것).
 - 자리잡기 문구: `⏳ 분리배출 문서에서 찾는 중…`
@@ -820,6 +868,7 @@ _— rag · A.X-4.0-Light · 0.6초_
 - [ ] 채널에서 `@버릴지도 아이스팩 어떻게 버려?` → **같은 스레드에** 답 + 📚 근거
 - [ ] DM 으로 `핫팩은?` → 답
 - [ ] `검색` · `비교` · 빈 멘션 · 300자 초과 · 범위 밖 질문(«강남구 재활용 요일?»)이 6-1 · 6-2 대로 동작
+- [ ] 2018 · 2026 근거가 함께 뽑히는 질문(«우유팩은 종이랑 같이 버려도 돼?»)에서 ℹ️ 안내 줄이 붙음
 - [ ] 봇을 켠 직후 첫 질문의 답이 **10초 안에** 옴 (워밍업 효과 — 실제 초를 기록)
 - [ ] 슬랙 질문 1건이 LangSmith trace 1건으로 보이고 metadata 에 `slack_user` 가 있음
 - [ ] 답하는 동안 `nvidia-smi` 사용량이 **8GB 미만** — 값을 기록해 README 3번 · CONTEXT «하드웨어» 의 5.6GB 와 비교(다르면 양쪽 문서 갱신)
@@ -904,6 +953,7 @@ python evaluate.py answer --model gemma3:4b               # (선택) 수업 기�
 
 **공통**
 
+- `--index` · `--model` 은 **`config` 를 import 하기 전에** `sys.argv` 에서 읽어 `os.environ["RECYCLE_INDEX"]` · `["RECYCLE_MODEL"]` 에 넣습니다(3-2절 — 설정은 실행 한 번에 하나). `--strategy` · `--year-bonus` 는 `search()` · `ask()` 의 인자로 넘깁니다.
 - 결과를 `eval_results/날짜-시각-{retrieval|answer}.md` 와 `.json` 으로 저장합니다(설정 · 모델 · 인덱스 manifest · 문항별 결과 포함). CONTEXT 부록에 옮길 표는 `.md` 에서 복사.
 - 추적 태그 `eval` + metadata `strategy` · `year_bonus` — LangSmith 에서 슬랙 질문과 구분됩니다.
 - 측정 전에 `ollama ps` 로 다른 모델이 떠 있지 않은지 확인.
@@ -912,7 +962,7 @@ python evaluate.py answer --model gemma3:4b               # (선택) 수업 기�
 
 | 순서 | 바꾸는 것 | 고정 | 보는 숫자 |
 |---|---|---|---|
-| E1 | **분할** — 재귀 400/40 (`index_recursive`) ↔ 구조 우선 (`index_recycle`) | 임베딩 KURE · basic · bonus 0 | Top-1 · Top-3 |
+| E1 | **분할** — 재귀 400/40 (`index_recursive` · 135청크) ↔ 구조 우선 (`index_recycle` · 460 안팎) | 같은 쪽 · 같은 정리 · 임베딩 KURE · basic · bonus 0 | Top-1 · Top-3 |
 | E2 | **검색 전략** — basic ↔ multiquery | 구조 인덱스 · bonus 0 | Top-3 (3회 범위) · 평균 시간 |
 | E3 | **`year_bonus`** — 0 · 0.5g · 1g · 2g | 구조 인덱스 · E2 에서 고른 전략 | Top-3 · 연도충돌 top-1 의 2026 수 · c1 |
 | E4 | **프롬프트** — 기존 ↔ «더 최근 근거를 따른다» 한 줄 추가 | E1~E3 채택 설정 | 생성 정답 수 · 자기모순 수 |
@@ -962,6 +1012,7 @@ python evaluate.py answer --model gemma3:4b               # (선택) 수업 기�
 | `docs/trace-metadata.png` | trace 의 metadata 탭 — `slack_user` · `model` · `embed_model` |
 | `docs/slack-thread.png` | 슬랙 스레드 — 질문 · 답 · 📚 근거 |
 
+- **캡처는 사용자가 직접 합니다**(LangSmith 웹 화면 · 슬랙 화면). 구현하는 AI 는 ① 캡처용 질문을 실행해 trace 를 만들고 ② 화면마다 «무엇이 보여야 하는지» 를 위 표대로 안내하고 ③ 받은 PNG 를 README 에 넣습니다. 이미지를 지어내거나 비워 둔 채 «완료» 로 적지 않습니다.
 - ⚠️ 무료 플랜 보존 14일 → **제출(12/4) 직전에 슬랙에서 다시 물어 새 trace 로 캡처**합니다. 11월 중순 trace 는 사라집니다.
 - 캡처에 **API 키 · 토큰 · 다른 사람의 슬랙 ID 가 보이지 않게** 합니다.
 - 캡처할 질문은 답이 분명한 것 2~3개(아이스팩 · 선글라스 · 생수병) + 범위 밖 1개.
@@ -978,7 +1029,7 @@ python evaluate.py answer --model gemma3:4b               # (선택) 수업 기�
 2. 저장소 받기 → 가상환경 → `pip install -r mini_project/requirements.txt`
 3. 모델 받기 (`ollama pull` 2줄) + `ollama list` 로 확인
 4. 문서 받기 — 가이드라인은 저장소에 있음, 사례집(68MB)은 CLAUDE.md «문서 받기» 의 `Invoke-WebRequest` 명령
-5. 루트 `.env` — 필요한 키 **이름만** (값 예시는 `xoxb-…`) · `LANGSMITH_TRACING=true`
+5. 루트 `.env` — `mini_project/.env.example` 을 가리키고 필요한 키 **이름만** (값 예시는 `xoxb-…`) · `LANGSMITH_TRACING=true`
 6. 슬랙 앱 준비 — Socket Mode · 이벤트 2개 · 권한 3개 (2-2절 5번)
 7. `python build_index.py --show` → `python build_index.py` (기대 출력 몇 줄)
 8. `python rag_backend.py "아이스팩 어떻게 버리지"` (터미널 확인)
@@ -1008,11 +1059,12 @@ python evaluate.py answer --model gemma3:4b               # (선택) 수업 기�
 | README 3번 | VRAM 실측 · 답 시간이 M3 재측정과 다르면 갱신. **«사용자의 질문이 외부 API 로 나가지 않고» → LangSmith 추적을 켜면 질문 · 근거 · 답이 LangSmith(클라우드)에 기록된다는 점을 밝히도록 수정** (13장 12번) |
 | README 4번 | ⑤ Retrieve 줄을 실제 구현(`RecycleRetriever` · 채택된 전략)으로 · LangSmith 캡처 이미지 삽입 |
 | README 체크리스트 | «착수 전 할 일» 의 `.env` 줄을 실제 키 이름으로 · 14주차 항목 체크 |
-| CONTEXT «분할» | 품목 243 → 실측값 · 본문 «재질 소절» → «쪽 단위 + `section`» · 구조 분할 후 청크 수 · 평균 길이 |
-| CONTEXT «메타데이터» | `section` 키 추가 · FAQ 에 `material` 없음 · `splitter` 실제 값 |
+| CONTEXT «분할» | 품목 243 → 실측값 · FAQ 평균 113자 · 최대 234자 → 실측값(13장 19번) · 본문 «재질 소절» → «쪽 단위 + `section`» · 구조 분할 후 청크 수 · 평균 길이 |
+| CONTEXT «메타데이터» | `section` 키 추가 · FAQ 에 `material` 없음 · `splitter` 실제 값 · `material` 의 용도를 «필터 · Self-Query» 에서 «심어 둠 — 필터는 개선 방향» 으로 (13장 17번) |
+| CONTEXT «관측» | «루트 `.env` 에 프로젝트 이름을 넣는다» → «`config.py` 가 `LANGSMITH_PROJECT` 를 지정» |
 | CONTEXT «처리 흐름» · «위험» | «11주차 예정» → 결과 |
 | CONTEXT 부록 | D(검색 전략 · `year`) · E(생성 재측정) 추가 |
-| CLAUDE.md | 현재 상태 표 · «다음 할 일» · 13장의 3곳 |
+| CLAUDE.md | 현재 상태 표 · «다음 할 일» · 모델 설치 상태 · «미결 사항» (마일스톤이 끝날 때마다) |
 
 ---
 
@@ -1026,6 +1078,16 @@ python evaluate.py answer --model gemma3:4b               # (선택) 수업 기�
 | **M3** | `slack_rag_bot.py` · VRAM 재측정 | 6-5절 체크리스트 | |
 | **M4** | `questions.py` · `evaluate.py` · 검색 개선 채택 | 7-4절 체크리스트 | 최종 제출 **12/4** 전까지 M4 ~ M5 |
 | **M5** | README 5 · 6번 · 문서 갱신 · LangSmith 캡처 · 제출 | 8-2절 캡처 7장 · 9장 · README 체크리스트 전부 ✅ | |
+
+**사용자가 직접 해야 하는 일** — 구현하는 AI 는 대신 하지 말고, 그 차례가 오면 멈추고 요청합니다.
+
+| 언제 | 무엇 |
+|---|---|
+| M0 | `ollama pull` 2건(5GB 내려받기) 승인 · 루트 `.env` 의 `LANGSMITH_TRACING=true` 변경 승인 · (필요하면) 슬랙 앱 표시 이름 |
+| M1 | `--show qa_case` 100줄 · `--show item_dict` 눈 확인 — AI 가 먼저 훑고 의심 가는 줄을 짚어 준 뒤 사용자가 확정 |
+| M3 | 슬랙에서 실제로 질문하기(봇은 AI 가 켬) · 슬랙 화면 캡처 |
+| M4 | 추가 평가 문항 6개의 `gold` · `must` 확인 |
+| M5 | LangSmith 화면 캡처 6장 · README 최종 확인 · 13장 11 · 12번 결정 · 커밋 · 푸시 승인 |
 
 - 각 단계는 **앞 단계의 수용 기준을 통과한 뒤** 시작합니다. M1 의 Q&A 100건이 틀린 채로 M2 로 가면 뒤가 전부 틀립니다.
 - M3 까지가 «필수 요건을 모두 충족한 최소 제출물» 입니다. 시간이 모자라면 M4 를 줄이고 M5 는 줄이지 않습니다(README 가 곧 점수).
@@ -1053,13 +1115,13 @@ CONTEXT «범위 밖» 9항목은 그대로 유효합니다. 구현 중 유혹�
 
 ## 12. 함정 모음
 
-CLAUDE.md «함정» 9개에 더해, 이번에 확인된 것.
+10주차에 밟은 것과 이번에 확인된 것을 모았습니다(CLAUDE.md «함정» 은 이 표의 요약).
 
 | # | 함정 | 대응 |
 |---|---|---|
 | 1 | 한글 경로에서 `store.save_local()` 실패 | `faiss_io.save_index` / `load_index` 만 사용 (`index.bytes` 로 저장되는 것이 정상) |
 | 2 | 콘솔 cp949 | 스크립트 시작에 `sys.stdout.reconfigure(encoding="utf-8")` · PowerShell `$env:PYTHONUTF8=1` |
-| 3 | **CLAUDE.md 의 머리말 정규식** — 가이드라인 머리말 절반(17줄)이 남고, 사례 번호 줄을 지움 | 4-3절의 `HDR_G` · `HDR_Q` |
+| 3 | **`scratch_eval.py` 의 머리말 정규식** — 가이드라인 머리말 절반(17줄)이 남고, 사례 번호 줄을 지움 | 4-3절의 `HDR_G` · `HDR_Q` |
 | 4 | **사례집을 날짜 순서대로 자르면 24건이 틀림** | 4-4절 — 품목 이름으로 짝짓기 |
 | 5 | 품목사전에 30자 필터 → 239개가 사라짐 | 필터는 본문에만 |
 | 6 | 초성 줄을 «한 글자 줄» 로 지우면 낫 · 못 · 컵 … 이 사라짐 | 14개 초성 글자만 |
@@ -1073,6 +1135,8 @@ CLAUDE.md «함정» 9개에 더해, 이번에 확인된 것.
 | 14 | 스크립트가 trace 전송 전에 끝남 | `wait_for_all_tracers()` |
 | 15 | `langchain_community` DeprecationWarning | 무시 (동작 무관) |
 | 16 | LangSmith 무료 플랜 14일 | 제출 직전 재캡처 |
+| 17 | 토큰 검사를 접두어(`xoxb-`)로 하면 봇 코드의 접두어 검사에 걸려 항상 «결과 있음» | 1장 «토큰 누출 검사» 의 식 |
+| 18 | `pypdf` 직접 호출과 `PyPDFLoader` 는 쪽 끝 공백이 달라 글자 수 · 재귀 청크 수가 1씩 다를 수 있음 | 줄 단위 `strip` 후 처리 · 문서에는 구현 출력값 |
 
 ---
 
@@ -1082,21 +1146,25 @@ CLAUDE.md «함정» 9개에 더해, 이번에 확인된 것.
 
 | # | 기존 문서 | 이 명세 · 실제 | 이유 |
 |---|---|---|---|
-| 1 | CLAUDE.md «머리말 정규식 (검증됨)» | 문서별 정규식 2개 (4-3절) | 실측 — 기존 것은 가이드라인 머리말 34줄 중 17줄만 지움(줄 앞 공백이 있는 17줄이 남음). 사례 번호 줄도 지움 |
+| 1 | `scratch_eval.py` 의 머리말 정규식 (예전 CLAUDE.md «검증됨» — CLAUDE.md 는 갱신함) | 문서별 정규식 2개 (4-3절) | 실측 — 기존 것은 가이드라인 머리말 34줄 중 17줄만 지움(줄 앞 공백이 있는 17줄이 남음). 사례 번호 줄도 지움 |
 | 2 ★ | CONTEXT «품목사전 한 줄 항목 243개» | 시험 파서 286항목 | 여러 줄 항목을 이어 붙이는 규칙 차이. 구현 후 실측값으로 교체 |
 | 3 ★ | CONTEXT «본문 1~7장 = 재질 소절 단위» | 쪽 단위 → 재귀 + `section` 메타데이터 | 그림 글자 조각 때문에 소절 제목을 규칙으로 못 잡음 |
 | 4 ★ | CONTEXT «30자 미만 청크는 버림» | 본문 청크에만 적용 | 품목사전 항목은 평균 20자 |
 | 5 ★ | CONTEXT 메타데이터 표 | `section` 추가 · FAQ 는 `material` 없음 · `splitter` 는 실제 적용값 | 4-5 · 4-8절 |
 | 6 ★ | CONTEXT «사례집 Q&A — 날짜를 닻으로 자름» | 날짜 + 번호로 메타를 잡고 **품목 이름으로 짝짓기** | 순서 짝짓기는 24건 오류 |
-| 7 ★ | README 체크리스트 «루트 `.env` — `LANGSMITH_PROJECT` · `EMBED_MODEL` · `MODEL`» | `LANGSMITH_TRACING=true` 만. 나머지는 `config.py` · `RECYCLE_*` | 다른 주차 실습 보호 (사용자 결정) |
+| 7 ★ | README 체크리스트 · CONTEXT «관측» 의 «루트 `.env` — `LANGSMITH_PROJECT` · `EMBED_MODEL` · `MODEL`» | `LANGSMITH_TRACING=true` 만. 나머지는 `config.py` · `RECYCLE_*` | 다른 주차 실습 보호 (사용자 결정) |
 | 8 | 10주차 봇의 `openai` 모드 | 삭제 | «상용 API 상시 호출 금지» · README «전부 로컬» (사용자 결정) |
-| 9 | CLAUDE.md «설치된 모델» 표에 A.X · KURE | **이 PC 의 `ollama list` 에 없음** (2026-11-13) | M0 에서 pull |
-| 10 ★ | CONTEXT 부록 B «재귀 400/40 → 181청크» | 같은 정리 · 같은 분할로 다시 돌리니 **182청크** (평균 294자는 같음) | 원인 미확인(1개 차이). M4 의 E1 에서 `--mode recursive` 로 다시 재서 그 값을 씀 |
+| 9 | README 3번의 `ollama pull` 2건 (예전 CLAUDE.md 는 «설치됨» 이라 적었음 — 갱신함) | **개발 PC 의 `ollama list` 에 없음** (2026-11-13) | M0 에서 pull |
+| 10 | CONTEXT 부록 B «재귀 400/40 → 181청크» | **181 이 맞음** — `scratch_eval.py` 방식(`PyPDFLoader` · 기존 정규식 · 전 쪽)으로 다시 재서 181청크 · 평균 295자 재현 | 앞서 182 로 보인 것은 `pypdf` 를 직접 불러 잰 탓(쪽 끝 공백 차이). E1 의 비교 기준은 이것과 **다른 것** — 구조 모드와 같은 쪽 · 같은 정리의 135청크(4-1절) |
 | 11 ★ | CONTEXT «사례집 발행 2026.05» | PDF 판권에는 «발행일 2026년 3월 26일» | 2026.05 는 협회 공지에 올라온 때로 보임 — 사용자 확인 필요 |
 | 12 ★ | README 3번 «사용자의 질문이 외부 API 로 나가지 않고» | LangSmith 추적(필수)을 켜면 질문 · 근거 · 답이 LangSmith 서버에 기록됨 | 모델 추론은 전부 로컬이 맞음. 문장을 «추론은 로컬 · 추적 기록은 LangSmith» 로 고쳐야 정확 |
 | 13 | CONTEXT «2025년 실제 질의» · 건마다 날짜 `2025-…` | 100건 중 1건은 `2024-11-06` (35쪽 게임기) | 날짜 정규식을 `20\d\d` 로 둔 이유 |
 | 14 | CONTEXT «사례 1건 평균 150자» | 질문+답 평균 132자, «품목:» 줄 포함 청크 평균 151자 | 재는 범위 차이 — 구현 후 실측값으로 |
 | 15 | CONTEXT 부록 B 의 15문항 | 원본 목록이 저장소에 없음 | 7장의 새 세트로 기준과 개선안을 함께 다시 잼 |
 | 16 | README 그림의 출처 «아이스팩 · 분리배출_가이드라인.pdf p.20» | «품목 · 가이드라인(2018) p.쪽» | 연도를 드러내려고(«사례집(2026) 기준이라고 밝힘») |
+| 17 ★ | CONTEXT 메타데이터 표 — `material` 의 용도 «필터 · Self-Query («플라스틱만 찾아줘»)» · 처리 흐름 그림 «year · material 필터는 11주차» | `material` 은 **심기만** 하고 필터로 쓰지 않음. `year` 는 필터가 아니라 거리 보정 | Self-Query 는 이번 범위 밖(0-2절). `year` 를 필터로 쓰면 2018 에만 있는 품목을 잃음(5-3절) |
+| 18 | README 2번 «2026 을 앞세우고 사례집(2026) 기준이라고 밝힘» | 출처 줄의 연도 + 연도가 섞일 때 ℹ️ 안내 줄(6-2절). «앞세우는» 정도는 M4 실측으로 정한 `year_bonus` | 채택 결과에 따라 README 문구를 맞춤(9-3절) |
+| 19 ★ | CONTEXT «FAQ 36문항 — 평균 113자 · 최대 234자» | 시험 파서 평균 106자 · 최대 218자 (건수 36 은 같음) | 재질 소제목 줄 · «08. 분리배출 앱 FAQ» 줄을 뺀 차이로 보임. 구현 후 실측값으로 교체 |
+| 20 | 출처 예시가 두 문서에서 다름 — README 그림 «아이스팩 · 분리배출_가이드라인.pdf p.20» / CONTEXT 그림 «냉동팩 · 가이드라인 p.20» | 실제 출력 형식 하나로 통일 (16번) | 둘 다 구현 전 예시. M5 에서 실제 답을 복사해 양쪽을 같게 |
 
-이 밖에 CONTEXT.md · README.md 에는 편집 중 줄이 섞여 깨진 곳이 있었고(«위험과 대응» 표 · 부록 C 끝 · README 3번 끝 문장 · «필수 요건 대조» 제목), 이 명세서와 함께 복구했습니다 — 복구 내용과 되살리지 못한 부분은 각 문서의 해당 위치에 표시해 두었습니다.
+이 밖에 CONTEXT.md · README.md 에는 편집 중 줄이 섞여 깨진 곳이 있었고(«위험과 대응» 표 · 부록 C 끝 · README 3번 끝 문장 · «필수 요건 대조» 제목), 이 명세서와 함께 복구했습니다. CONTEXT.md 는 고친 자리에 HTML 주석(«복구 메모»)으로 무엇을 어떻게 고쳤는지 남겼고, README.md 는 원래 글이 분명해 표시 없이 되돌렸습니다. **되살리지 못한 것은 한 곳** — CONTEXT 부록 C «실제 답 비교» 표의 «마트 영수증» 행 A.X 답 뒷부분입니다(M2 에서 `scratch_eval.py` 를 다시 돌려 채울 것).

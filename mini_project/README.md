@@ -170,7 +170,7 @@ ollama pull hf.co/mykor/KURE-v1-gguf:Q8_0              # 0.6 GB
 | ✗ 상용 API 상시 호출 | 전부 로컬(Ollama) | 3번 |
 | ✗ 범위 없는 챗봇 | 분리배출 한정 · 문서 2건 · «범위 밖» 9항목 | CONTEXT «범위 밖» |
 | 권장 유형 | **특정 문서 도메인 QA 봇** (RAG · 10~11주차) | — |
-| 토
+| 토큰은 루트 `.env` 에만 | `SLACK_BOT_TOKEN` · `SLACK_APP_TOKEN` 커밋 안 함(`.gitignore`) | — |
 
 ## 제출 체크리스트
 
