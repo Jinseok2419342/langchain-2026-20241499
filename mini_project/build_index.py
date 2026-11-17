@@ -52,6 +52,7 @@ from faiss_io import load_index, save_index  # noqa: E402  ← 한글 경로 대
 (GUIDE_PDF, GUIDE_YEAR, _), (QA_PDF, QA_YEAR, _) = DOCS
 DOC_TYPES = ("qa_case", "faq", "item_dict", "guideline")
 RECURSIVE = f"recursive-{CHUNK_SIZE}-{CHUNK_OVERLAP}"
+EMBED_BATCH = 64                # 임베딩 요청 한 번에 보낼 청크 수 (save() 주석 참고)
 
 # ── 구역 지도 (쪽 번호는 1부터) ─────────────────────────────────────
 BODY_PAGES = range(3, 21)       # 가이드라인 본문 1~7장
@@ -550,7 +551,12 @@ def save(chunks: list[Document], out_dir: Path, mode: str) -> None:
     print(f"\n임베딩  : {EMBED_MODEL} — {len(chunks)}청크, 잠시 걸립니다…")
     start = time.perf_counter()
     try:
-        store = FAISS.from_documents(chunks, emb)       # ★ from_texts 가 아니다 — metadata 를 지킨다
+        # ★ from_texts 가 아니다 — metadata 를 지킨다.
+        # ★ 64개씩 나눠 보낸다 — 456개를 한 요청에 보내면 Ollama 0.32.14 러너가 간헐적으로 죽는다
+        #    («…/tokenize: connection refused» · 2026-11-17 실측: 한 번에 3회 중 2회 실패, 64개씩 3회 모두 성공)
+        store = FAISS.from_documents(chunks[:EMBED_BATCH], emb)
+        for i in range(EMBED_BATCH, len(chunks), EMBED_BATCH):
+            store.add_documents(chunks[i:i + EMBED_BATCH])
     except Exception as e:
         raise SystemExit(
             f"임베딩 실패 — {type(e).__name__}: {e}\n"

@@ -9,34 +9,51 @@
 슬랙에서 «뽁뽁이 어떻게 버려?» 라고 물으면, 분리배출 PDF 2건에서 근거를 찾아(RAG) 배출 방법 + 출처(품목 · 문서 · 연도 · 쪽)를 스레드에 답하는 봇.
 동양미래대 «최신인공지능» 수업(학번 20241499) 미니 프로젝트. **응답은 한국어로.**
 
-## 현재 상태 (2026-11-13 기준)
+## 현재 상태 (2026-11-17 기준)
 
-> ★ **코드는 다 썼지만, 실제 모델로는 한 번도 돌려 보지 못했습니다.**
-> 2026-11-13 의 구현은 메인 PC 가 아닌 곳(Ollama · GPU · `.env` 없음)에서 했습니다.
-> 그래서 «모델 없이 확인할 수 있는 것» 만 확인했고, **다음 작업은 메인 PC 에서 처음 실행하며 다듬는 것**입니다.
+> ★ **2026-11-17 에 실제 모델로 처음 돌렸습니다** — 메인 PC 와 사양이 같은 보조 PC(RTX 3070 8GB · Ollama 0.32.14 · Python 3.13.3 · 영문 경로 클론).
+> 인덱스 생성 → 터미널 → 슬랙(멘션 · DM) → LangSmith → 평가 E1~E4 까지 통과. 아래 «2026-11-17 첫 실행 결과» 참고.
+> **다음 작업은 기본값 채택(`year_bonus`) 확정 → 문서 갱신(M5)** 입니다.
 
 | 단계 | 상태 |
 |---|---|
 | 10주차 명세 (README 1~4번 + CONTEXT.md) | ✅ 완료 · 제출됨 |
-| 상세 구현 명세서 [SPEC.md](SPEC.md) | ✅ 완료 — 구현하며 달라진 점은 13-1절 |
-| **코드 작성** (M1~M4 분량 · 파일 9개) | ✅ 작성 완료 · **모델 없이 검증** (아래 표) |
-| 구성도 · 가상 시나리오 (`docs/`) | ✅ 작성 완료 — Mermaid 16개 렌더링 확인. 시나리오의 답 · 거리 · 시간은 **예상** 표시 |
-| **M0 사전 준비** (모델 pull · `.env`) | ❌ 메인 PC 에서 |
-| **첫 실행** (인덱스 생성 → 터미널 → 슬랙) | ❌ **다음 작업** — 아래 «다음 할 일» |
-| 평가 실측 → 기본값 채택 (M4) | ❌ `strategy` · `year_bonus` 는 아직 `basic` · `0` |
+| 상세 구현 명세서 [SPEC.md](SPEC.md) | ✅ 완료 — 구현하며 달라진 점은 13-1절 (k: 임베딩 64개씩) |
+| **코드 작성** (M1~M4 분량 · 파일 9개) | ✅ 작성 · **실제 모델로 검증** (2026-11-17) |
+| 구성도 · 가상 시나리오 (`docs/`) | ✅ 작성 완료 — 시나리오의 답 · 거리 · 시간은 아직 **예상** 표시 → M5 에서 실측으로 |
+| **M0 사전 준비** (모델 pull · `.env`) | ✅ 보조 PC 에서 완료 (메인 PC 는 따로 pull 필요) |
+| **첫 실행** (인덱스 생성 → 터미널 → 슬랙) | ✅ 2026-11-17 — 슬랙 멘션 · DM · `검색` · `비교` · 빈 멘션 · 범위 밖 왕복 |
+| 평가 실측 → 기본값 채택 (M4) | 🔶 E1~E4 측정 완료 (`eval_results/`). `strategy=basic` 확정 · `year_bonus` 0 ↔ 0.09 **사용자 확인 대기** |
 | README 5 · 6번 · 문서 갱신 · LangSmith 캡처 (M5) | ❌ |
+
+### 2026-11-17 첫 실행 결과 (실측 · 보조 PC)
+
+| 항목 | 값 | 파일 |
+|---|---|---|
+| 인덱스 | 456청크 · 임베딩 6.6초 · 되읽기 «안경·선글라스 p.31» / 재귀 비교 135청크 3.0초 | `index_recycle/` · `index_recursive/` (gitignore) |
+| 10주차 6문항 (`--ids scratch`) | **6/6** · 자기모순 0 (10주차와 같음) | `eval_results/20261117-145633-answer.md` |
+| E1 분할 (basic · bonus 0 · 24문항) | 재귀 Top-1 **16** · Top-3 **19** → 구조 Top-1 **22** · Top-3 **23** | `…153339-retrieval` · `…153601-retrieval` |
+| E2 전략 | multiquery Top-1 18~20 · Top-3 20~21 (3회) · 1.76초 ↔ basic 22 · 23 · 0.33초 → **basic** | `…153601-retrieval` |
+| E3 year_bonus (g = 0.180) | 0: 22/23 · 연도충돌 top-1 2026 **2/4** / **0.5g(0.090): 23/23 · 4/4 · c1 ○** / 1g: 21/22 / 2g: 14/20 · c1 × | `…153601-retrieval` |
+| 생성 30문항 | bonus 0 · base **28/30** / bonus 0.09 · base **28/30** / bonus 0 · recent 28/30 + 자기모순 1 / bonus 0.09 · recent **27/30** + 자기모순 1 → 프롬프트 **base 유지** | `…153652` · `…153846` · `…153750` · `…153940` (`-answer`) |
+| 공통 오답 | **y2 생수병** — 검색 ×(사례집 p.13 «먹는 샘물» 을 못 찾음) → «유리병 수거함» 오답 / **i1 주입** — 프롬프트 누출은 없으나 «찾지 못했습니다» 대신 엉뚱한 품목 답 | 같음 |
+| 시간 · VRAM | 첫 답(로딩 포함) 27.9초 · 워밍업 뒤 답 0.5~1.6초 · 봇 켠 직후 첫 슬랙 답 1.3초 · `nvidia-smi` **5.75~6.09 / 8 GB** | |
+| LangSmith | 프로젝트 `recycle-bot-20241499` 에 `recycle-rag` · `recycle-plain` · `recycle-search` · `build-chunks` trace. 슬랙 질문은 metadata `slack_user` · `slack_channel` 있음 | |
+
+- **MultiQuery 가 진 이유**: 다시 쓰기 프롬프트의 예시(«쓰봉 → 종량제봉투, 락앤락 → 플라스틱 밀폐용기»)를 A.X 가 거의 모든 질문에 끌어다 씀 («플라스틱 밀폐용기에 담긴 아이스팩 처리 방법»). 검색어 대신 답 문장을 쓰기도 함(«마트 영수증은 종이류로 분리배출해야 합니다.»). 프롬프트를 고치면 다시 잴 수 있음 — 지금은 «효과 없음» 으로 기록
+- **`recent` 프롬프트**: y2 를 «찾지 못했습니다» 로 바꾸고(자기모순), bonus 0.09 와 함께 쓰면 y1 이 오답 → 채택 안 함
+- **`year_bonus` 0.09**: SPEC 7-3 의 `year_bonus` 규칙(«Top-3 가 줄지 않고 c1 이 깨지지 않는 값 중 연도충돌 2026 이 가장 많은 값»)으로는 **채택**, 그러나 생성 정답은 28 = 28 로 같음 → 사용자 확인 후 `config.py` 반영 (바꾸면 `tests/offline_check.py` 의 «기본 year_bonus = 0» 검사도 고칠 것)
 
 **일정**: 13주차(11/27) 중간 점검 — 슬랙 왕복까지 · **14주차(12/4) 최종 제출**. 제출물 = 코드 + README + LangSmith 추적 캡처(필수).
 
 ### 검증한 것 / 못 한 것
 
-| ✅ 검증함 (모델 없이) | ❌ 아직 못 함 (메인 PC 에서) |
+| ✅ 검증함 | ❌ 아직 못 함 |
 |---|---|
-| `python build_index.py --check` — 15항목 통과 (실제 PDF 2건) | 실제 KURE-v1 로 임베딩 · 인덱스 저장 |
-| `python questions.py` — 30문항의 정답 위치 36개가 실제 청크에 있음 | 검색 Top-1 · Top-3 · 생성 정답 수 (**전부 미측정**) |
-| `python tests/offline_check.py` — 41항목 통과. 가짜 임베딩 · 가짜 LLM · 가짜 슬랙 클라이언트로 검색기 · trace 모양 · 슬랙 갈래 전부 · 평가 스크립트를 돌림 | 실제 슬랙 왕복 · 실제 LangSmith 화면 · VRAM · 답 시간 |
-| `ChatOllama` · `OllamaEmbeddings` 생성자 인자가 실제 클래스에서 받아들여짐 | 모델이 «찾지 못했습니다» · 지시 바꾸기 거절을 실제로 하는지 |
-| 토큰 누출 검사(SPEC 1장) — 출력 없음 | 한글 경로에서의 저장 (`index.bytes` 경로 — 이 클론은 영문 경로) |
+| 모델 없이: `build_index.py --check` 15항목 · `questions.py` · `tests/offline_check.py` 41항목 (Python 3.11 · **3.13.3** 둘 다) | **한글 경로에서의 저장** (`index.bytes` 경로 — 보조 PC 클론도 영문 경로) → 메인 PC 에서 |
+| 실제 모델 (2026-11-17): 임베딩 · 인덱스 · 검색 · 생성 · 평가 E1~E4 — 위 «첫 실행 결과» | 슬랙 화면의 최종 문구(ℹ️ 안내 줄 · 사용법 안내) — 콘솔 · LangSmith 로는 분기만 확인, **화면은 사용자 확인 필요** |
+| 실제 슬랙 왕복(멘션 · DM · 검색 · 비교 · 빈 멘션 · 범위 밖) · LangSmith trace · VRAM | Ollama 를 끈 상태의 오류 처리 (SPEC 6-5) · LangSmith 화면 캡처 · 슬랙 화면 캡처 |
+| 범위 밖 «찾지 못했습니다» 4/4 · i2(요리사) 거절 | **i1(시스템 프롬프트 출력 요구)** — 누출은 없으나 엉뚱한 품목 답 (오답) |
 
 ⚠️ 가짜 임베딩은 글자 2-gram 해시라 **검색 순위에 의미가 없습니다.** `offline_check.py` 가 통과했다는 것은 «코드가 끝까지 돈다» 는 뜻이지 «답이 맞다» 는 뜻이 아닙니다.
 
@@ -99,7 +116,9 @@ Invoke-WebRequest "https://www.kwaste.or.kr/lib/fileDownload.php?save_file=attac
 ```
 (사례집 원 게시글: 한국폐기물협회 공지 `https://www.kwaste.or.kr/community/01.php?admin_mode=read&no=6128` · 2026-11-13 에 위 링크로 68,862,868바이트 내려받기 확인)
 
-## 다음 할 일 — 메인 PC 에서 첫 실행 (순서대로 · 앞 단계가 통과한 뒤 다음으로)
+## 다음 할 일 — 첫 실행 순서 (0~7번은 2026-11-17 보조 PC 에서 통과 · **남은 것은 8번**)
+
+> 메인 PC 에서 다시 돌릴 때도 이 순서. 0번(모델 pull · 사례집 PDF)은 PC 마다 필요. 8번 전에 `year_bonus` 채택을 사용자에게 확인.
 
 ```powershell
 cd mini_project
@@ -116,14 +135,14 @@ $env:PYTHONUTF8=1
 | 5 | `python evaluate.py answer --ids scratch` | 10주차와 같은 6문항 — **6/6 이 나오는지** (CONTEXT 부록 C 와 비교) | 6/6 이 아니면 분할이 바뀐 영향 — 어느 문항인지 `eval_results/` 에서 확인 |
 | 6 | `python slack_rag_bot.py` → 슬랙에서 멘션 · DM · `검색` · `비교` · 빈 멘션 | SPEC 6-5절 체크리스트 · LangSmith 에 `recycle-rag` trace · `nvidia-smi` 8GB 미만 | 봇이 답을 안 하면 `10-30/socket_hello.py` 로 슬랙 쪽부터 |
 | 7 | `python build_index.py --mode recursive --out index_recursive` → `python evaluate.py retrieval --index index_recursive` → `python evaluate.py retrieval` → `python evaluate.py answer` (→ `--prompt recent`) | E1~E4 결과가 `eval_results/` 에 | SPEC 7-3절 채택 규칙 |
-| 8 | 채택한 값을 `config.py` 기본값에 반영 → README 5 · 6번 · CONTEXT 부록 D · E · `docs/scenarios.md` 의 «예상» 을 실제 출력으로 → LangSmith 캡처 7장 | SPEC 8-2절 · 9장 | 캡처는 **사용자가 직접** · 무료 플랜 14일 → 제출 직전에 |
+| 8 | 채택한 값을 `confi던 곳 → 2026-11-17 확인 결과**
 
-**처음 실행에서 깨질 가능성이 있는 곳** (모델 없이는 확인할 수 없었던 것)
-
-1. **`keep_alive`** — `OllamaEmbeddings` 는 정수만 받아 `1800`(초)으로 넣었음. Ollama 서버가 이 값을 실제로 받아들이는지는 미확인
-2. **A.X 의 다시 쓰기 출력 형식** — `parse_queries` 는 줄바꿈으로 나뉜 질문을 기대함. 모델이 한 줄에 쉼표로 쓰거나 설명을 붙이면 검색 질문이 이상해짐 → `python rag_backend.py --strategy multiquery 검색 "뽁뽁이"` 로 «↳ 찾아낸 검색 질문» 을 볼 것
-3. **`is_not_found` 의 60자 기준** — 모델이 «찾지 못했습니다» 뒤에 긴 사과문을 붙이면 근거 숨김이 안 걸림
-4. **검색 품질** — 품목사전 청크가 평균 20자로 매우 짧음(282개 · 전체의 62%). 짧은 청크가 거리 계산에서 유리하거나 불리할 수 있음 → E1(분할 A/B)이 이것을 잼
+1. **`keep_alive`** — ✅ 정수 `1800` 을 Ollama 가 받음 (`ollama ps` 에 «29 minutes from now»)
+2. **A.X 의 다시 쓰기 출력 형식** — ❌ 줄바꿈 형식은 지키지만 **내용이 문제**: 프롬프트 예시(종량제봉투 · 플라스틱 밀폐용기)를 거의 모든 질문에 섞고, 답 문장 · «다음 검색 질문을 사용할 수 있습니다:» 같은 설명 줄도 냄 → E2 에서 basic 보다 나쁨
+3. **`is_not_found` 의 60자 기준** — ✅ 범위 밖 4문항 · 슬랙 «강남구» 모두 «자료에서 찾지 못했습니다.» 한 문장
+4. **검색 품질** — ✅ 짧은 품목사전 청크가 오히려 유리 (구조 Top-3 23/24 ↔ 재귀 19/24)
+5. **`year_bonus` 의 눈금** — g = **0.180** (구조) · 0.134 (재귀). 0.5g = 0.090 이 후보
+6. **슬랙 이벤트** — ✅ `bot_id` 거르기로 자기 답에 다시 답하지 않음. DM 은 `im:history` scope 가 없어 처음엔 안 왔음 (함정 17)/B)이 이것을 잼
 5. **`year_bonus` 의 눈금** — L2 거리 범위를 몰라 기본값이 0. `evaluate.py retrieval` 이 출력하는 `g` 를 보고 정할 것
 6. **슬랙 이벤트** — DM 은 `message.im` 구독이 있어야 옴. 봇 자신의 메시지를 `bot_id` 로 거르는데, 실제 이벤트에 그 키가 오는지는 미확인
 
@@ -207,6 +226,11 @@ $env:PYTHONUTF8=1
 13. **콘솔 cp949** — 스크립트는 `sys.stdout.reconfigure(encoding="utf-8")` 를 함. PowerShell 은 `$env:PYTHONUTF8=1`
 14. **10주차 봇과 동시 실행 금지** — 같은 `SLACK_APP_TOKEN` 이면 이벤트가 둘로 갈림
 15. `pypdf` 직접 호출과 `PyPDFLoader` 는 쪽 끝 공백이 달라 글자 수 · 재귀 청크 수가 1씩 다를 수 있음 → 문서에는 구현 출력값
+16. **임베딩을 한 요청에 456개 보내면 Ollama 0.32.14 러너가 간헐적으로 죽음** (`…/tokenize: connection refused` · 3회 중 2회) → `build_index.py` 는 `EMBED_BATCH = 64` 개씩 보냄 (2026-11-17 · SPEC 13-1 k)
+17. **DM 이 안 오면 봇 토큰 scope 에 `im:history` 가 있는지** — `app_mentions:read` 만 있으면 멘션만 됨. scope 추가 후 **Reinstall to Workspace** 필요. App Home 의 Messages Tab 도 켤 것
+18. **슬랙의 실제 봇 이름은 `@Jinseok-20241499-Bot`** — 문서의 `@버릴지도` 는 별명. `@봇 @버릴지도 검색 …` 처럼 두 번 쓰면 `검색` · `비교` 모드가 안 걸림
+19. 보조 PC 의 Ollama 는 PATH 에 없음 (`%LOCALAPPDATA%\Programs\OllamaAIClass\ollama.exe`) — `evaluate.py` 가 `ollama ps` 를 부르므로 `$env:Path += ";$env:LOCALAPPDATA\Programs\OllamaAIClass"` 후 실행
+20. PowerShell 에서 한글이 깨지면 `[Console]::OutputEncoding=[Text.Encoding]::UTF8` (`PYTHONUTF8` 만으로는 파이프 출력이 깨짐)
 
 ## 사용자 확인이 필요한 미결 사항 (SPEC 13장)
 

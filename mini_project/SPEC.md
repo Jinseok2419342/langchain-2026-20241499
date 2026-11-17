@@ -1185,6 +1185,7 @@ CONTEXT «범위 밖» 9항목은 그대로 유효합니다. 구현 중 유혹�
 | h | 3-1절 파일 목록 | `tests/offline_check.py` · `docs/architecture.md` · `docs/scenarios.md` 추가 | 모델 없이 코드 경로를 확인하는 검사 · 구성도 |
 | i | 6-2절 근거 줄 | 같은 출처가 겹치면 **한 번만** 표시 | 본문 청크 둘이 같은 쪽 · 같은 소절이면 출처 문자열이 같음 |
 | j | 6-1절 검색 모드 | trace 이름 `recycle-search` · 태그 `search` 로 추적에 남김 | 검색 모드도 슬랙 입력이라 |
+| k | 4장 저장 `FAISS.from_documents(chunks, …)` 한 번 | `EMBED_BATCH = 64` 개씩 — 첫 묶음 `from_documents` 뒤 `add_documents` (2026-11-17) | 456청크를 한 요청에 보내면 Ollama 0.32.14 러너가 간헐적으로 죽음(`…/tokenize: connection refused` · 3회 중 2회). 64개씩은 3회 모두 성공 · 결과 벡터 동일 |
 
 **검증한 것 / 못 한 것**
 
