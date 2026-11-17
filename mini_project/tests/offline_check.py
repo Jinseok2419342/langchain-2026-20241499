@@ -73,9 +73,11 @@ hits = rb.search("뽁뽁이는 어떻게 버려요?")
 T(len(hits) == 3 and all({"distance", "adjusted", "via"} <= set(h.metadata) for h in hits), "search → 3개 + distance/adjusted/via")
 print("     ", [rb.source_of(h) for h in hits])
 T(all("distance" not in d.metadata for d in rb.get_store().docstore._dict.values()), "docstore 원본 metadata 불변")
-h0 = rb.search("뽁뽁이는 어떻게 버려요?", year_bonus=0.0); h9 = rb.search("뽁뽁이는 어떻게 버려요?", year_bonus=9.0)
+h9 = rb.search("뽁뽁이는 어떻게 버려요?", year_bonus=9.0)
 T(all(h.metadata["year"] == 2026 for h in h9) and h9[0].metadata["adjusted"] < h9[0].metadata["distance"], "year_bonus 가 크면 2026 문서가 위로")
-T([h.metadata["chunk_id"] for h in h0] == [h.metadata["chunk_id"] for h in hits], "기본 year_bonus = 0")
+hd = rb.search("뽁뽁이는 어떻게 버려요?", year_bonus=config.YEAR_BONUS)
+T(config.YEAR_BONUS == 0.09 and [h.metadata["chunk_id"] for h in hd] == [h.metadata["chunk_id"] for h in hits],
+  f"기본 year_bonus = {config.YEAR_BONUS} (실측 채택값 0.09)")
 with collect_runs() as cb:
     ans, docs, sec = rb.ask("뽁뽁이는 어떻게 버려요?", {"slack_user": "U1"}, strategy="multiquery")
 root = cb.traced_runs[0]; kids = [c.name for c in root.child_runs]

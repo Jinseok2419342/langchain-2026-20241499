@@ -37,8 +37,12 @@ MIN_BODY_CHARS = 30     # 가이드라인 **본문** 청크에만 적용 (품목
 TOP_K = 3               # 근거로 넘길 청크 수
 FETCH_K = 10            # 재정렬 전에 넓게 가져올 후보 수
 YEAR_RECENT = 2020      # 이 해 이후 문서를 «최신» 으로 본다
-# ★ 아래 두 기본값은 evaluate.py 실측(E2 · E3)으로 채택한 뒤 바꾼다 — 지금은 «아무것도 안 켠» 기준값
-YEAR_BONUS = float(os.getenv("RECYCLE_YEAR_BONUS", "0"))
+# ★ 아래 기본값은 evaluate.py 실측(2026-11-17)으로 채택한 값
+#   YEAR_BONUS 0.09 = 0.5g (g = 0.180) — eval_results/20261117-153601-retrieval.md:
+#     Top-3 23 → 23 (줄지 않음) · c1 ○ · 연도충돌 top-1 이 2026 2/4 → 4/4. 생성은 28/30 = 28/30 (…153652 ↔ …153846)
+#   STRATEGY basic — multiquery 는 Top-3 20~21 로 오히려 낮고 5배 느림 (같은 파일)
+#   PROMPT base — recent 는 27~28/30 + 자기모순 1 (…153750 · …153940)
+YEAR_BONUS = float(os.getenv("RECYCLE_YEAR_BONUS", "0.09"))
 STRATEGY = os.getenv("RECYCLE_STRATEGY", "basic")          # basic | multiquery
 PROMPT_VARIANT = os.getenv("RECYCLE_PROMPT", "base")       # base | recent — E4 실험용 («더 최근 근거를 따른다» 한 줄)
 
