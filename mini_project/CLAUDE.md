@@ -15,18 +15,18 @@
 > 인덱스 생성 → 터미널 → 슬랙(멘션 · DM) → LangSmith → 평가 E1~E4 까지 통과. 아래 «2026-11-17 첫 실행 결과» 참고.
 > 기본값 채택(`basic` · `year_bonus 0.09` · `base`)과 문서 갱신(README 5 · 6 · CONTEXT 부록 D ~ F · scenarios)까지 끝났습니다.
 > ★ **2026-11-19 캡처 5장을 README 에 넣음** (LangSmith 3장 · 슬랙 2장 · `docs/*.png` · SPEC 13-1 l) → 수업 PDF 필수 요건 전부 충족.
-> **남은 것: 미결 8 (사용자가 보류) · 시나리오 8(Ollama 끈 상태) 실제 확인 (선택).**
+> **남은 것: 시나리오 8(Ollama 끈 상태) 실제 확인 (선택) 하나뿐.** 미결 8 은 README 에 안내 한 줄로 정리(2026-11-19).
 
 | 단계 | 상태 |
 |---|---|
 | 10주차 명세 (README 1~4번 + CONTEXT.md) | ✅ 완료 · 제출됨 |
 | 상세 구현 명세서 [SPEC.md](SPEC.md) | ✅ 완료 — 구현하며 달라진 점은 13-1절 (k: 임베딩 64개씩) |
 | **코드 작성** (M1~M4 분량 · 파일 9개) | ✅ 작성 · **실제 모델로 검증** (2026-11-17) |
-| 구성도 · 가상 시나리오 (`docs/`) | ✅ 작성 완료 — 시나리오의 답 · 거리 · 시간은 아직 **예상** 표시 → M5 에서 실측으로 |
-| **M0 사전 준비** (모델 pull · `.env`) | ✅ 보조 PC 에서 완료 (메인 PC 는 따로 pull 필요) |
+| 구성도 · 가상 시나리오 (`docs/`) | ✅ 작성 · 2026-11-17 실측으로 갱신 (시나리오 8 의 Ollama 끄기만 «예상») |
+| **M0 사전 준비** (모델 pull · `.env`) | ✅ 보조 PC 에서 완료 (메인 PC 재세팅은 하지 않기로 함 · 2026-11-19) |
 | **첫 실행** (인덱스 생성 → 터미널 → 슬랙) | ✅ 2026-11-17 — 슬랙 멘션 · DM · `검색` · `비교` · 빈 멘션 · 범위 밖 왕복 |
-| 평가 실측 → 기본값 채택 (M4) | ✅ E1~E4 측정 (`eval_results/`) → `config.py` 기본값 `basic` · **`year_bonus 0.09`** · `base` (사용자 승인 2026-11-17). CONTEXT 부록 D · E 는 M5 에서 |
-| README 5 · 6번 · 문서 갱신 · LangSmith 캡처 (M5) | ✅ 2026-11-17 — README 5 · 6번 작성 · 맨 위 그림 · 2 · 3 · 4번 실측 반영 / CONTEXT 분할 · 메타데이터 · 처리 흐름 · 관측 · 위험 갱신 + 부록 C 복구 · **D · E · F 추가** / `docs/scenarios.md` 예상 → 실측. 2026-11-19 캡처 5장 README 반영. **남은 것: 아래 미결 8(보류) · 시나리오 8(Ollama 끄기) 확인(선택)** |
+| 평가 실측 → 기본값 채택 (M4) | ✅ E1~E4 측정 (`eval_results/`) → `config.py` 기본값 `basic` · **`year_bonus 0.09`** · `base` (사용자 승인 2026-11-17). CONTEXT 부록 D · E 반영됨 |
+| README 5 · 6번 · 문서 갱신 · LangSmith 캡처 (M5) | ✅ 2026-11-17 — README 5 · 6번 작성 · 맨 위 그림 · 2 · 3 · 4번 실측 반영 / CONTEXT 분할 · 메타데이터 · 처리 흐름 · 관측 · 위험 갱신 + 부록 C 복구 · **D · E · F 추가** / `docs/scenarios.md` 예상 → 실측. 2026-11-19 캡처 5장 README 반영. **남은 것: 시나리오 8(Ollama 끄기) 확인(선택)** |
 
 ### 2026-11-17 첫 실행 결과 (실측 · 보조 PC)
 
@@ -103,9 +103,8 @@ langchain_20241499/                ← git 저장소 루트 (github.com/Jinseok2
     ├── docs/scenarios.md          ← 가상 시나리오 8개 (Mermaid 8개)
     ├── docs/*.png                 ← 캡처 5장 (trace-rag · trace-retriever · trace-build · slack-thread · slack-compare)
     ├── scratch_eval.py            ← 10주차 생성 모델 비교 스크립트 (CONTEXT 부록 C 재현용 · 그대로 둠)
-    ├── not_done_plan.md           ← SPEC 작성 때의 작업 메모 (내용은 SPEC 에 반영됨 · 지워도 됨)
-    ├── index_recycle/             ← build_index.py 가 만듦 (gitignore · 아직 없음)
-    ├── eval_results/              ← evaluate.py 가 만듦 (커밋함 · 아직 없음)
+    ├── index_recycle/             ← build_index.py 가 만듦 (gitignore · 보조 PC 에만 있음)
+    ├── eval_results/              ← evaluate.py 가 만듦 (커밋함 · 2026-11-17 실행 7회분)
     └── data/
         ├── 분리배출_가이드라인.pdf        ← 커밋됨 (4.8MB · 36쪽)
         └── 분리배출_QA사례100_2026.pdf   ← ⚠️ 68MB · gitignore → 없으면 아래 명령으로 받기
@@ -121,7 +120,7 @@ Invoke-WebRequest "https://www.kwaste.or.kr/lib/fileDownload.php?save_file=attac
 
 ## 다음 할 일 — 첫 실행 순서 (0~7번은 2026-11-17 보조 PC 에서 통과 · 8번은 2026-11-19 캡처까지 완료)
 
-> 메인 PC 에서 다시 돌릴 때도 이 순서. 0번(모델 pull · 사례집 PDF)은 PC 마다 필요. 8번 전에 `year_bonus` 채택을 사용자에게 확인.
+> 다른 PC 에서 처음부터 다시 돌릴 때도 이 순서. 0번(모델 pull · 사례집 PDF)은 PC 마다 필요.
 
 ```powershell
 cd mini_project
@@ -153,6 +152,8 @@ $env:PYTHONUTF8=1
 
 ## 환경 (메인 PC 기준 · SPEC 2장)
 
+> 실제 실행 · 검증은 같은 사양의 보조 PC(영문 경로)에서 함(2026-11-17). 메인 PC 재세팅 · 한글 경로 재검증은 하지 않기로 함(2026-11-19 · 평가 항목 아님).
+
 - **OS: Windows** · PowerShell / Git Bash. **경로에 한글(`최신인공`)이 있음** ← 함정 1
 - 파이썬: `..\venv\Scripts\python.exe` (3.13.3). 필요한 패키지는 설치돼 있음 — 새 패키지를 추가하지 않음
 - `venv/` · `.env` · `index*/` · 사례집 PDF 는 gitignore 라 **다른 클론에는 없음**
@@ -160,8 +161,8 @@ $env:PYTHONUTF8=1
 
 | 모델 이름 (Ollama) | 용도 | 상태 |
 |---|---|---|
-| `hf.co/mykor/A.X-4.0-Light-gguf:Q4_K_M` | ★ **생성** (SKT A.X 4.0 Light 7B · 4.4GB) | ⚠️ 2026-11-13 `ollama list` 에 **없었음** → pull |
-| `hf.co/mykor/KURE-v1-gguf:Q8_0` | ★ **임베딩** (고려대 KURE-v1 · 1024차원 · 0.6GB) | ⚠️ 위와 같음 |
+| `hf.co/mykor/A.X-4.0-Light-gguf:Q4_K_M` | ★ **생성** (SKT A.X 4.0 Light 7B · 4.4GB) | 보조 PC 에 pull 해서 사용 (2026-11-17) · 메인 PC 에는 없음 (2026-11-13) |
+| `hf.co/mykor/KURE-v1-gguf:Q8_0` | ★ **임베딩** (고려대 KURE-v1 · 1024차원 · 0.6GB) | 위와 같음 |
 | `gemma3:4b` · `qwen3-embedding:0.6b` | 수업 기본 — **비교 기준으로만** | 설치됨 |
 | `exaone3.5:2.4b` | 생성 모델 대체용 (`RECYCLE_MODEL` 로 교체 · 인덱스 재생성 불필요) | 설치됨 |
 
@@ -170,7 +171,7 @@ $env:PYTHONUTF8=1
 | 키 | 현재 | 할 일 |
 |---|---|---|
 | `SLACK_BOT_TOKEN` · `SLACK_APP_TOKEN` · `LANGSMITH_API_KEY` | 있음 | 그대로 |
-| `LANGSMITH_TRACING` | `false` | **`true` 로** (사용자 확인 후) |
+| `LANGSMITH_TRACING` | 보조 PC `true` (2026-11-17) · 메인 PC `false` | 추적하려면 `true` |
 | `EMBED_MODEL` · `MODEL` | 다른 주차 실습용 | **건드리지 않음** — 이 프로젝트는 읽지 않음 |
 | `RECYCLE_*` | 없음 | 넣지 않아도 됨. 바꿔서 잴 때만 |
 
@@ -195,7 +196,7 @@ $env:PYTHONUTF8=1
   값이 없으면 키를 **넣지 않음**. FAQ 에는 `material` · `item` 없음
 - **인덱스**: FAISS + `faiss_io` · `index_recycle/` · **`manifest.json`** 에 임베딩 모델 기록 → 읽을 때 다르면 종료
 - **검색** (`rag_backend.py`): `RecycleRetriever`(`BaseRetriever`) = `rewrite_queries`(multiquery 일 때만) → `candidates`(질문마다 10개 · 같은 청크는 최소 거리) → `rank`(year ≥ 2020 이면 거리 − `year_bonus` · 상위 3개).
-  돌려주는 청크의 metadata 에 `distance` · `adjusted` · `via` 를 덧붙임(복사본에). **기본값 `basic` · `0` — 평가 실측 전에는 바꾸지 않음**
+  돌려주는 청크의 metadata 에 `distance` · `adjusted` · `via` 를 덧붙임(복사본에). **기본값 `basic` · `0.09` (E1~E4 실측 뒤 채택 · 2026-11-17)**
 - **생성**: LCEL `RAG_PROMPTS["base"] | ChatOllama(temperature=0.1, num_predict=300, num_ctx=4096, keep_alive=1800) | StrOutputParser`.
   `base` 프롬프트는 `scratch_eval.py` 의 `PROMPT` 와 **글자 단위로 같음** (부록 C 의 6/6 이 이 문구로 잰 값). `recent` 는 E4 실험용
 - **출처 형식**: `안경·선글라스 · 사례집(2026) p.31` — 코드가 metadata 로 만듦(`source_of`)
@@ -205,12 +206,12 @@ $env:PYTHONUTF8=1
 - **평가** (`evaluate.py`): `retrieval` = 전략 × `year_bonus`(0 · 0.5g · 1g · 2g) 격자 · multiquery 3회 반복 / `answer` = `must` · `bad` · 자기모순 채점.
   옵션 `--index` · `--model` · `--prompt` · `--strategy` · `--year-bonus` · `--ids`(`scratch` = 10주차 6문항) · `--repeats` · `--no-multiquery`
 
-## 10주차 실측 (근거 데이터 · 자세한 건 CONTEXT 부록 — 구현 뒤의 측정값은 아직 없음)
+## 10주차 실측 (근거 데이터 · 자세한 건 CONTEXT 부록 A ~ C — 구현 뒤 재측정은 위 «첫 실행 결과» · 부록 D ~ F)
 
 - 임베딩(재귀 400/40 · **181청크** · 일상 말투 15문항): Top-3 정답 qwen3 **12/15** → KURE **15/15**
 - 생성(KURE top-3 · 6문항): gemma3:4b **4/6**(자기모순 2회) → A.X **6/6**, 답당 0.4~0.7초, 첫 호출 20초(로딩)
 - VRAM: A.X 4.6GB + KURE 0.38GB → nvidia-smi **5.6GB / 8GB**
-- ⚠️ 위는 **구조 분할 전**(재귀 181청크)의 값. 지금 인덱스는 456청크라 같은 숫자가 나온다는 보장이 없음 → «다음 할 일» 5 · 7번으로 다시 잼
+- ⚠️ 위는 **구조 분할 전**(재귀 181청크)의 값. 지금 인덱스는 456청크 → 2026-11-17 에 다시 잼: 10주차 6문항 6/6 · 30문항 28/30 · nvidia-smi 5.75~6.37GB
 
 ## 함정 (밟았거나 실측으로 확인한 것 · 전체는 SPEC 12장)
 
@@ -246,7 +247,7 @@ $env:PYTHONUTF8=1
 5. ✅ 구현 실측값 — CONTEXT 분할 표에 «구현 결과» 표 추가(282 · 106자 · 456 · 쪽 단위 + `section`) · 메타데이터 표 갱신. 설계 때 시험 표(243 등)는 «설계 기록» 으로 남김
 6. ✅ README 맨 위 그림 · CONTEXT 처리 흐름 그림 — 실제 출력 형식(«아이스팩 · 가이드라인(2018) p.31»)으로 통일 · «구현 예정» 삭제
 7. ✅ README 5번 · 6번 작성 (2026-11-17 실제로 돌린 명령 · 결과)
-8. ⏳ **슬랙 봇 표시 이름** — 문서 · 사용법 안내는 `@버릴지도`, 실제는 `@Jinseok-20241499-Bot`. (가) 앱 표시 이름을 바꿈 / (나) 안내 문구를 고침 → **사용자가 나중에 결정**. README 5-4절은 `@봇` 으로 적어 둠. 2026-11-19: 당분간 그대로 둠 — 기존 슬랙 앱 설정의 표시 이름이라 동작에는 문제 없음
+8. ✅ **슬랙 봇 표시 이름** — 문서는 처음 보는 사람이 알기 쉬운 `@버릴지도` 그대로 두고, README 2번 «실제 슬랙 화면» 에 «테스트 당시 봇 이름은 `@Jinseok-20241499-Bot`» 한 줄 추가 (사용자 결정 · 2026-11-19). 슬랙 앱 설정은 바꾸지 않음 · README 5-4절은 `@봇`
 
 ## 작업 규칙
 
