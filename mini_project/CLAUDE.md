@@ -137,16 +137,16 @@ $env:PYTHONUTF8=1
 | 5 | `python evaluate.py answer --ids scratch` | 10주차와 같은 6문항 — **6/6 이 나오는지** (CONTEXT 부록 C 와 비교) | 6/6 이 아니면 분할이 바뀐 영향 — 어느 문항인지 `eval_results/` 에서 확인 |
 | 6 | `python slack_rag_bot.py` → 슬랙에서 멘션 · DM · `검색` · `비교` · 빈 멘션 | SPEC 6-5절 체크리스트 · LangSmith 에 `recycle-rag` trace · `nvidia-smi` 8GB 미만 | 봇이 답을 안 하면 `10-30/socket_hello.py` 로 슬랙 쪽부터 |
 | 7 | `python build_index.py --mode recursive --out index_recursive` → `python evaluate.py retrieval --index index_recursive` → `python evaluate.py retrieval` → `python evaluate.py answer` (→ `--prompt recent`) | E1~E4 결과가 `eval_results/` 에 | SPEC 7-3절 채택 규칙 |
-| 8 | 채택한 값을 `confi던 곳 → 2026-11-17 확인 결과**
+| 8 | 채택한 값을 `config.py` 기본값에 반영 → README 5 · 6번 · CONTEXT 부록 D · E · `docs/scenarios.md` 의 «예상» 을 실제 출력으로 → LangSmith 캡처 7장 | SPEC 8-2절 · 9장 | 캡처는 **사용자가 직접** · 무료 플랜 14일 → 제출 직전에 |
+
+**처음 실행에서 깨질 가능성이 있던 곳 → 2026-11-17 확인 결과**
 
 1. **`keep_alive`** — ✅ 정수 `1800` 을 Ollama 가 받음 (`ollama ps` 에 «29 minutes from now»)
 2. **A.X 의 다시 쓰기 출력 형식** — ❌ 줄바꿈 형식은 지키지만 **내용이 문제**: 프롬프트 예시(종량제봉투 · 플라스틱 밀폐용기)를 거의 모든 질문에 섞고, 답 문장 · «다음 검색 질문을 사용할 수 있습니다:» 같은 설명 줄도 냄 → E2 에서 basic 보다 나쁨
 3. **`is_not_found` 의 60자 기준** — ✅ 범위 밖 4문항 · 슬랙 «강남구» 모두 «자료에서 찾지 못했습니다.» 한 문장
 4. **검색 품질** — ✅ 짧은 품목사전 청크가 오히려 유리 (구조 Top-3 23/24 ↔ 재귀 19/24)
 5. **`year_bonus` 의 눈금** — g = **0.180** (구조) · 0.134 (재귀). 0.5g = 0.090 이 후보
-6. **슬랙 이벤트** — ✅ `bot_id` 거르기로 자기 답에 다시 답하지 않음. DM 은 `im:history` scope 가 없어 처음엔 안 왔음 (함정 17)/B)이 이것을 잼
-5. **`year_bonus` 의 눈금** — L2 거리 범위를 몰라 기본값이 0. `evaluate.py retrieval` 이 출력하는 `g` 를 보고 정할 것
-6. **슬랙 이벤트** — DM 은 `message.im` 구독이 있어야 옴. 봇 자신의 메시지를 `bot_id` 로 거르는데, 실제 이벤트에 그 키가 오는지는 미확인
+6. **슬랙 이벤트** — ✅ `bot_id` 거르기로 자기 답에 다시 답하지 않음. DM 은 `im:history` scope 가 없어 처음엔 안 왔음 (함정 17)
 
 **사용자가 직접 해야 하는 일** (그 차례에 멈추고 요청): 모델 pull · `.env` 변경 승인 / `--show qa_case` 100줄 눈 확인 / 슬랙에서 질문 · 화면 캡처 / LangSmith 캡처 / 커밋 · 푸시 승인
 
