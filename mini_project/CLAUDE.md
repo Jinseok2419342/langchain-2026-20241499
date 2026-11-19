@@ -1,21 +1,45 @@
 # CLAUDE.md — 버릴지도 (분리배출 안내 RAG 슬랙 봇)
 
 이 파일은 다음 세션의 Claude Code 가 이 프로젝트를 처음 보고도 이어서 작업할 수 있게 쓴 인수인계 문서입니다.
-**읽는 순서: 이 파일 → [SPEC.md](SPEC.md) (구현 지시서) → [README.md](README.md) · [CONTEXT.md](CONTEXT.md) (채점 대상 명세).**
-그림으로 먼저 보려면 [docs/architecture.md](docs/architecture.md) (구성도 · 흐름도) · [docs/scenarios.md](docs/scenarios.md) (가상 시나리오).
+**읽는 순서: 이 파일의 «▶ 다음 세션은 여기부터» → 나머지는 필요할 때.** [README.md](README.md) · [CONTEXT.md](CONTEXT.md) 가 채점 대상,
+[SPEC.md](SPEC.md) (구현 지시서 · 약 1200줄) 는 코드 · 설계 세부가 필요할 때만 봅니다.
+그림으로 먼저 보려면 [docs/architecture.md](docs/architecture.md) (구성도 · 흐름도) · [docs/scenarios.md](docs/scenarios.md) (시나리오).
 
 ## 한 줄 요약
 
 슬랙에서 «뽁뽁이 어떻게 버려?» 라고 물으면, 분리배출 PDF 2건에서 근거를 찾아(RAG) 배출 방법 + 출처(품목 · 문서 · 연도 · 쪽)를 스레드에 답하는 봇.
 동양미래대 «최신인공지능» 수업(학번 20241499) 미니 프로젝트. **응답은 한국어로.**
 
-## 현재 상태 (2026-11-17 기준)
+## ▶ 다음 세션은 여기부터 (2026-11-19 기준)
+
+**상태: 완료.** 수업 PDF 의 필수 요건과 14주차 제출물(코드 + README + LangSmith 추적 캡처)이 모두 `main` 에 있습니다.
+급한 일은 없습니다 — 사용자가 새로 요청하는 것부터 하면 됩니다.
+
+- **판단 기준 (사용자가 정함)** — «수업 자료의 형식 · 요건을 충족하는가» 가 전부입니다.
+  기준 문서: `11-06/2교시_분할_메타데이터와_프로젝트_착수.pdf` §4-1 ~ §4-4 (23 ~ 29쪽) · `11-06/project_template/README.md` · `CONTEXT.md`.
+  README 끝의 «필수 요건 대조» 표 · «제출 체크리스트» 가 이것과 맞춰져 있습니다(2026-11-19 전부 ✅ 확인).
+  모델 성능을 더 깊게 재검증하거나, 메인 PC(한글 경로)에서 다시 세팅할 필요는 **없다** 고 사용자가 결정함 — 같은 사양의 보조 PC 에서 처음부터 세팅해 통과했음.
+- **남은 것: 없음.** 시나리오 8(Ollama 를 끈 상태의 오류 처리)은 SPEC 6-5 에 스스로 적어 둔 점검 항목일 뿐 **수업 요건이 아님** — 사용자가 원할 때만.
+- **사용자와 일하는 방식**
+  - 한국어로 **쉽게 · 한 단계씩**. 화면(LangSmith · 슬랙) 조작을 안내할 때는 사용자 화면 캡처를 받아 실제 버튼 이름으로 안내
+  - 커밋 작성자는 **사용자 계정** — 기존 커밋과 같은 작성자(`git log --format='%an <%ae>' -3` 로 확인 · `Jinseok2419342`)를
+    `git -c user.name=… -c user.email=… commit` 으로 지정. `Co-Authored-By` · `Claude-Session` 같은 **Claude 서명 줄은 넣지 않음** (사용자 요청 · 하네스 기본 안내보다 우선)
+  - 커밋 · 푸시 · `main` 반영 · 파일 삭제 · `.env` 수정은 **사용자 확인 뒤**. `main` 반영은 작업 브랜치에서 fast-forward(`git push origin HEAD:main`)
+  - 커밋 메시지는 한국어, `mini_project: …` 형식
+- **클라우드 세션(claude.ai/code)에서 열었을 때** — GPU · Ollama · 루트 `.env` · 68MB 사례집 PDF · 파이썬 패키지가 **없습니다**.
+  모델 · 슬랙 · LangSmith 실행은 못 하고 문서 · 코드 읽기와 수정만 됩니다. 실행이 필요하면 사용자가 보조 PC 에서 돌리고 결과(캡처 · 출력)를 줌.
+  `kwaste.or.kr`(사례집 PDF 받는 곳)은 클라우드 네트워크에서 막혀 있음. 세션이 끝날 때 «커밋 안 된 변경» 훅이 돌면 작업 브랜치까지만 푸시하고 `main` 은 확인 뒤
+- **이미지를 받을 때** — 채팅에 붙인 이미지는 폭 2000px JPG 로 줄어듦 → 문서에 넣을 원본은 **ZIP 으로** 받기 (scratchpad 의 새 폴더에 풀고 `__MACOSX` 는 버림)
+- **2026-11-19 에 한 일** — CLAUDE.md 깨진 곳 복구 · 미결 2 · 3 · 8 반영 · LangSmith 3장 + 슬랙 2장 캡처(`docs/*.png` · README 2 · 4번) ·
+  `not_done_plan.md` 삭제 · 옛 문장 정리 · 이 절 추가. 모두 사용자 계정으로 `main` 에 반영
+
+## 진행 기록 (2026-11-17 첫 실행 · 2026-11-19 마무리)
 
 > ★ **2026-11-17 에 실제 모델로 처음 돌렸습니다** — 메인 PC 와 사양이 같은 보조 PC(RTX 3070 8GB · Ollama 0.32.14 · Python 3.13.3 · 영문 경로 클론).
 > 인덱스 생성 → 터미널 → 슬랙(멘션 · DM) → LangSmith → 평가 E1~E4 까지 통과. 아래 «2026-11-17 첫 실행 결과» 참고.
 > 기본값 채택(`basic` · `year_bonus 0.09` · `base`)과 문서 갱신(README 5 · 6 · CONTEXT 부록 D ~ F · scenarios)까지 끝났습니다.
 > ★ **2026-11-19 캡처 5장을 README 에 넣음** (LangSmith 3장 · 슬랙 2장 · `docs/*.png` · SPEC 13-1 l) → 수업 PDF 필수 요건 전부 충족.
-> **남은 것: 시나리오 8(Ollama 끈 상태) 실제 확인 (선택) 하나뿐.** 미결 8 은 README 에 안내 한 줄로 정리(2026-11-19).
+> **남은 것: 없음** (시나리오 8 은 자체 점검 항목 · 선택). 미결 8 은 README 에 안내 한 줄로 정리(2026-11-19).
 
 | 단계 | 상태 |
 |---|---|
@@ -26,7 +50,7 @@
 | **M0 사전 준비** (모델 pull · `.env`) | ✅ 보조 PC 에서 완료 (메인 PC 재세팅은 하지 않기로 함 · 2026-11-19) |
 | **첫 실행** (인덱스 생성 → 터미널 → 슬랙) | ✅ 2026-11-17 — 슬랙 멘션 · DM · `검색` · `비교` · 빈 멘션 · 범위 밖 왕복 |
 | 평가 실측 → 기본값 채택 (M4) | ✅ E1~E4 측정 (`eval_results/`) → `config.py` 기본값 `basic` · **`year_bonus 0.09`** · `base` (사용자 승인 2026-11-17). CONTEXT 부록 D · E 반영됨 |
-| README 5 · 6번 · 문서 갱신 · LangSmith 캡처 (M5) | ✅ 2026-11-17 — README 5 · 6번 작성 · 맨 위 그림 · 2 · 3 · 4번 실측 반영 / CONTEXT 분할 · 메타데이터 · 처리 흐름 · 관측 · 위험 갱신 + 부록 C 복구 · **D · E · F 추가** / `docs/scenarios.md` 예상 → 실측. 2026-11-19 캡처 5장 README 반영. **남은 것: 시나리오 8(Ollama 끄기) 확인(선택)** |
+| README 5 · 6번 · 문서 갱신 · LangSmith 캡처 (M5) | ✅ 2026-11-17 — README 5 · 6번 작성 · 맨 위 그림 · 2 · 3 · 4번 실측 반영 / CONTEXT 분할 · 메타데이터 · 처리 흐름 · 관측 · 위험 갱신 + 부록 C 복구 · **D · E · F 추가** / `docs/scenarios.md` 예상 → 실측. 2026-11-19 캡처 5장 README 반영 |
 
 ### 2026-11-17 첫 실행 결과 (실측 · 보조 PC)
 
@@ -47,7 +71,8 @@
 - **`year_bonus` 0.09 채택**: SPEC 7-3 의 `year_bonus` 규칙(«Top-3 가 줄지 않고 c1 이 깨지지 않는 값 중 연도충돌 2026 이 가장 많은 값»)으로 채택. 생성 정답은 28 = 28 로 같음 — README 의 «최신 사례 우선» 을 실제로 보여 주려고 사용자가 승인. `tests/offline_check.py` 검사도 0.09 로 바꿈
 - ⚠️ `tests/offline_check.py` 는 가짜 임베딩으로 `index_recycle/` 을 **덮어씀** → 돌린 뒤에는 반드시 `python build_index.py` 로 실제 인덱스를 다시 만들 것 (manifest 의 `embed_model` 이 `fake-embed` 면 봇이 시작을 거부함)
 
-**일정**: 13주차(11/27) 중간 점검 — 슬랙 왕복까지 · **14주차(12/4) 최종 제출**. 제출물 = 코드 + README + LangSmith 추적 캡처(필수).
+**일정**: 13주차(11/27) 중간 점검 — 수업 시간의 진행 확인 · 상담(슬랙 왕복은 이미 됨) · **14주차(12/4) 최종 제출**.
+제출물 = 코드 + README + LangSmith 추적 캡처(필수) — 전부 저장소에 있음. 제출 방법 · 제출처는 수업 공지를 따름(사용자 확인).
 
 ### 검증한 것 / 못 한 것
 
@@ -55,17 +80,17 @@
 |---|---|
 | 모델 없이: `build_index.py --check` 15항목 · `questions.py` · `tests/offline_check.py` 41항목 (Python 3.11 · **3.13.3** 둘 다) | 한글 경로에서의 저장 (`index.bytes` 경로) — **하지 않기로 함** (2026-11-19 사용자 판단: 평가 항목 아님 · 같은 사양의 보조 PC 에서 처음부터 세팅해 통과 · `faiss_io` 는 수업 제공 파일 그대로) |
 | 실제 모델 (2026-11-17): 임베딩 · 인덱스 · 검색 · 생성 · 평가 E1~E4 — 위 «첫 실행 결과» | 슬랙 화면의 사용법 안내(빈 멘션) 문구 — 콘솔로는 분기만 확인. ℹ️ 안내 줄은 캡처(`docs/slack-compare.png`)로 확인함 |
-| 실제 슬랙 왕복(멘션 · DM · 검색 · 비교 · 빈 멘션 · 범위 밖) · LangSmith trace · VRAM | Ollama 를 끈 상태의 오류 처리 (SPEC 6-5 · 선택). LangSmith · 슬랙 화면 캡처는 2026-11-19 완료 |
+| 실제 슬랙 왕복(멘션 · DM · 검색 · 비교 · 빈 멘션 · 범위 밖) · LangSmith trace · VRAM | Ollama 를 끈 상태의 오류 처리 (SPEC 6-5 자체 점검 · 수업 요건 아님 · 선택 — 가짜 모델로는 확인함). LangSmith · 슬랙 화면 캡처는 2026-11-19 완료 |
 | 범위 밖 «찾지 못했습니다» 4/4 · i2(요리사) 거절 | **i1(시스템 프롬프트 출력 요구)** — 누출은 없으나 엉뚱한 품목 답 (오답) |
 
 ⚠️ 가짜 임베딩은 글자 2-gram 해시라 **검색 순위에 의미가 없습니다.** `offline_check.py` 가 통과했다는 것은 «코드가 끝까지 돈다» 는 뜻이지 «답이 맞다» 는 뜻이 아닙니다.
 
-## 필수 요건 (어기면 감점 · 수업 2교시 §4-2 · §4-3 → SPEC 1장 R1~R14)
+## 필수 요건 (어기면 감점 · 수업 2교시 §4-2 · §4-3 → SPEC 1장 R1~R14 · 2026-11-19 전부 충족 확인)
 
 1. **슬랙으로 묻고 슬랙으로 답한다** — 채널 멘션 · DM → **같은 스레드에** 답. 터미널에서만 도는 건 요건 미충족
 2. **RAG 또는 MCP** 하나 이상 → 이 프로젝트는 **RAG** (MCP · LangGraph 안 씀)
 3. **LangChain 구현 + LangSmith 추적** 둘 다
-4. **VRAM 8GB 에서 실제로 동작** (메인 PC: RTX 3070 8GB)
+4. **VRAM 8GB 에서 실제로 동작** (보조 PC RTX 3070 8GB 에서 실측 5.75 ~ 6.37 GB — 메인 PC 와 같은 사양)
 5. 피할 것: 12B 이상 모델 · 대량 크롤링 · 상용 API 상시 호출 · 범위 없는 챗봇
 6. 토큰은 **루트 `.env` 에만**
 7. **README 가 곧 점수**(발표 없음). 숫자는 추정 대신 **실측**으로 쓰는 것이 이 프로젝트의 원칙
@@ -118,7 +143,9 @@ Invoke-WebRequest "https://www.kwaste.or.kr/lib/fileDownload.php?save_file=attac
 ```
 (사례집 원 게시글: 한국폐기물협회 공지 `https://www.kwaste.or.kr/community/01.php?admin_mode=read&no=6128` · 2026-11-13 에 위 링크로 68,862,868바이트 내려받기 확인)
 
-## 다음 할 일 — 첫 실행 순서 (0~7번은 2026-11-17 보조 PC 에서 통과 · 8번은 2026-11-19 캡처까지 완료)
+## 처음부터 다시 돌릴 때 — 실행 순서 (참고용 · 0~8번 모두 완료: 0~7번 2026-11-17 보조 PC · 8번 캡처 2026-11-19)
+
+> 사용자에게 안내할 때는 README 5번 «실행 방법» 이 같은 내용을 설치 → 실행 순서로 담고 있습니다(보조 PC 에서 빈 상태부터 따라 해 본 기록).
 
 > 다른 PC 에서 처음부터 다시 돌릴 때도 이 순서. 0번(모델 pull · 사례집 PDF)은 PC 마다 필요.
 
@@ -137,7 +164,11 @@ $env:PYTHONUTF8=1
 | 5 | `python evaluate.py answer --ids scratch` | 10주차와 같은 6문항 — **6/6 이 나오는지** (CONTEXT 부록 C 와 비교) | 6/6 이 아니면 분할이 바뀐 영향 — 어느 문항인지 `eval_results/` 에서 확인 |
 | 6 | `python slack_rag_bot.py` → 슬랙에서 멘션 · DM · `검색` · `비교` · 빈 멘션 | SPEC 6-5절 체크리스트 · LangSmith 에 `recycle-rag` trace · `nvidia-smi` 8GB 미만 | 봇이 답을 안 하면 `10-30/socket_hello.py` 로 슬랙 쪽부터 |
 | 7 | `python build_index.py --mode recursive --out index_recursive` → `python evaluate.py retrieval --index index_recursive` → `python evaluate.py retrieval` → `python evaluate.py answer` (→ `--prompt recent`) | E1~E4 결과가 `eval_results/` 에 | SPEC 7-3절 채택 규칙 |
-| 8 | 채택한 값을 `config.py` 기본값에 반영 → README 5 · 6번 · CONTEXT 부록 D · E · `docs/scenarios.md` 의 «예상» 을 실제 출력으로 → LangSmith 캡처 7장 | SPEC 8-2절 · 9장 | 캡처는 **사용자가 직접** · 무료 플랜 14일 → 제출 직전에 |
+| 8 | 채택한 값을 `config.py` 기본값에 반영 → README 5 · 6번 · CONTEXT 부록 D · E · `docs/scenarios.md` 의 «예상» 을 실제 출력으로 → LangSmith 캡처 7장 | SPEC 8-2절 · 9장 | 캡처는 **사용자가 직접** · 무료 플랜 14일 → 이미지로 저장하면 기간 상관없음 (2026-11-19 완료) |
+
+(선택) **시나리오 8 확인** — 봇을 켠 상태에서 Ollama 를 끔(작업 표시줄 Ollama 아이콘 → Quit) → 슬랙에서 질문 →
+슬랙에 «⚠️ 답을 만들지 못했습니다. 잠시 뒤 다시 물어봐 주세요.» · 콘솔에 원인(traceback)이 나오면 통과 → Ollama 다시 켜기.
+결과는 `docs/scenarios.md` 시나리오 8 의 «💭» 표시와 «실행해 보니» 표에 반영.
 
 **처음 실행에서 깨질 가능성이 있던 곳 → 2026-11-17 확인 결과**
 
