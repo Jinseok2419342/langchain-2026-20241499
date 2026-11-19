@@ -49,6 +49,19 @@
   실측: 연도 충돌 문항의 1위가 2026 문서인 수 2/4 → **4/4** · 검색 정답 수는 그대로 (CONTEXT 부록 D)
 - 답은 먼저 «⏳ 찾는 중…» 으로 자리를 잡고, 답이 오면 그 메시지를 고칩니다 (9 · 10주차 봇과 같은 방식)
 
+**실제 슬랙 화면** (2026-11-17 · RTX 3070 8GB PC 에서 봇 실행)
+
+![슬랙 스레드 — 질문 · 답 · 근거](docs/slack-thread.jpg)
+
+오른쪽 스레드: «아이스팩 어떻게 버려?» → 답 + 📚 근거(품목 · 문서 · 연도 · 쪽) + 걸린 시간.
+왼쪽: 이날 슬랙에서 시험한 질문들 — 멘션 · `검색` · `비교` · 빈 멘션(사용법 안내) · 범위 밖(«강남구 재활용 요일?»).
+
+![비교 모드 — RAG 없이 vs RAG 로](docs/slack-compare.jpg)
+
+`비교`: RAG 없이(모델 기억만)는 «마트 영수증은 재활용이 가능한 경우가 많습니다» — **틀림** /
+RAG 로(문서에서 찾아서)는 «종량제 봉투로 배출해야 합니다» — **맞음** + 근거 3개.
+근거에 2018 가이드라인과 2026 사례집이 섞여 ℹ️ 안내 줄이 붙었습니다.
+
 ## 3. 사용 모델과 선택 근거 ★
 
 | 역할 | 수업 기본 | **이 프로젝트** | 출처 |
@@ -151,6 +164,28 @@ ollama pull hf.co/mykor/KURE-v1-gguf:Q8_0              # 0.6 GB
   - **전처리도 추적** — PDF 정리 · 구조 분할 함수에 `@traceable` → 인덱스를 만들 때 청크가 어떤 모양으로 나왔는지 남김
   - 태그: `rag` · `no-rag`(비교 모드) / 메타데이터: `model` · `embed_model` · `slack_user`
 - **LangGraph**: 사용하지 않음 — 분기 · 순환이 없어 **LCEL 로 충분**합니다.
+
+### LangSmith 추적 캡처 ★ (필수 제출물 · 2026-11-17 trace)
+
+> 무료 플랜은 trace 를 14일만 보관하므로, 링크 대신 화면을 이미지로 저장했습니다(`docs/`).
+
+**① 슬랙 질문 1건 = trace 1건** — `recycle-rag` 아래 검색(`RecycleRetriever`)과 생성(`generate` → `ChatOllama`)이 나란히 있고,
+질문 · 답 · 근거 3개가 한 trace 에 남습니다. 위 슬랙 화면의 «아이스팩» 질문과 같은 것입니다.
+
+![trace — recycle-rag](docs/trace-rag.jpg)
+
+(기본값 `year_bonus 0.09` 를 정하기 전(15:25)에 물은 질문이라 화면에는 `year_bonus 0` 으로 나옵니다.)
+
+**② 검색 결과와 metadata** — 1위 근거 «아이스팩 쓰레기 종량제 봉투로 배출» 의 metadata:
+`item 아이스팩` · `source 분리배출_가이드라인.pdf` · `page 31` · `year 2018` · `doc_type item_dict` · `distance 0.5015`.
+슬랙 답의 출처 «아이스팩 · 가이드라인(2018) p.31» 은 모델이 쓰는 것이 아니라 **이 metadata 로 코드가 만듭니다.**
+
+![trace — RecycleRetriever](docs/trace-retriever.jpg)
+
+**③ 전처리도 추적** — 인덱스를 만들 때(`build-chunks` · `mode structure`) 정리(`clean-pages`)와
+구역별 분할(`split-guideline` · `split-faq` · `split-item-dict` · `split-qa-cases`)이 run 으로 남고, 결과는 `count 456` 청크.
+
+![trace — build-chunks](docs/trace-build.jpg)
 
 ## 5. 실행 방법
 
@@ -295,8 +330,8 @@ Bolt app is running!
 | 요건 | 이 프로젝트 | 어디에 |
 |---|---|---|
 | **LangChain 기반 구현** | Loader · Splitter · OllamaEmbeddings · FAISS · LCEL 체인 | 4번 |
-| **LangSmith 추적** | 질문 1건 = trace 1건(검색 + 생성) · 전처리 `@traceable` · 프로젝트 `recycle-bot-20241499` | 4번 · CONTEXT «관측» |
-| **슬랙으로 묻고 슬랙으로 답한다** | 채널 멘션 · DM → 같은 스레드에 답 (`slack_bolt` Socket Mode) | 2번 · 4번 |
+| **LangSmith 추적** | 질문 1건 = trace 1건(검색 + 생성) · 전처리 `@traceable` · 프로젝트 `recycle-bot-20241499` | 4번(캡처 3장) · CONTEXT «관측» |
+| **슬랙으로 묻고 슬랙으로 답한다** | 채널 멘션 · DM → 같은 스레드에 답 (`slack_bolt` Socket Mode) | 2번(슬랙 화면) · 4번 |
 | **처리: RAG 또는 MCP (하나 이상)** | **RAG** — 고른 이유 명시 | 4번 · CONTEXT «처리 흐름» |
 | **VRAM 8GB 에서 실제로 동작** | 계산 6.4GB · **실측 5.6 ~ 6.4GB** (RTX 3070 8GB에서 두 모델 동시 구동 · 슬랙 봇 실행 중) | 3번 · CONTEXT «하드웨어 확인» |
 | 모델 선택 근거 (품질 · 속도 · 비용 · 보안 · 오프라인 · VRAM) | 품질(한국어 검색 · 지시 수행) + 속도 + 보안 · 오프라인 + VRAM — 수업 기본 모델과 **같은 조건 실측 비교** | 3번 · CONTEXT 부록 |
@@ -325,5 +360,5 @@ Bolt app is running!
 - [x] 최종 산출물(코드) — 실제 모델 · 실제 슬랙으로 확인 (2026-11-17)
 - [x] 평가 E1 ~ E4 실측 → 기본값 채택 (`eval_results/` · CONTEXT 부록 D · E)
 - [x] `README.md` 6항목
-- [ ] ★★ **LangSmith 추적 캡처(필수)** — 무료 플랜 보존 14일. **제출 직전에 캡처**
-- [ ] 슬랙 대화 화면 캡처
+- [x] ★★ **LangSmith 추적 캡처(필수)** — 4번 «LangSmith 추적 캡처» 3장 (`docs/trace-*.jpg` · 보존 14일이라 이미지로 저장)
+- [x] 슬랙 대화 화면 캡처 — 2번 «실제 슬랙 화면» 2장 (`docs/slack-*.jpg`)

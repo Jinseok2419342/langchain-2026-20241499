@@ -14,7 +14,8 @@
 > ★ **2026-11-17 에 실제 모델로 처음 돌렸습니다** — 메인 PC 와 사양이 같은 보조 PC(RTX 3070 8GB · Ollama 0.32.14 · Python 3.13.3 · 영문 경로 클론).
 > 인덱스 생성 → 터미널 → 슬랙(멘션 · DM) → LangSmith → 평가 E1~E4 까지 통과. 아래 «2026-11-17 첫 실행 결과» 참고.
 > 기본값 채택(`basic` · `year_bonus 0.09` · `base`)과 문서 갱신(README 5 · 6 · CONTEXT 부록 D ~ F · scenarios)까지 끝났습니다.
-> **남은 것: 미결 8 (사용자가 보류) · 시나리오 8 실제 확인 · 제출 직전 캡처 7장(SPEC 8-2) · README 에 캡처 넣기.**
+> ★ **2026-11-19 캡처 5장을 README 에 넣음** (LangSmith 3장 · 슬랙 2장 · `docs/*.jpg` · SPEC 13-1 l) → 수업 PDF 필수 요건 전부 충족.
+> **남은 것: 미결 8 (사용자가 보류) · 시나리오 8(Ollama 끈 상태) 실제 확인 (선택).**
 
 | 단계 | 상태 |
 |---|---|
@@ -25,7 +26,7 @@
 | **M0 사전 준비** (모델 pull · `.env`) | ✅ 보조 PC 에서 완료 (메인 PC 는 따로 pull 필요) |
 | **첫 실행** (인덱스 생성 → 터미널 → 슬랙) | ✅ 2026-11-17 — 슬랙 멘션 · DM · `검색` · `비교` · 빈 멘션 · 범위 밖 왕복 |
 | 평가 실측 → 기본값 채택 (M4) | ✅ E1~E4 측정 (`eval_results/`) → `config.py` 기본값 `basic` · **`year_bonus 0.09`** · `base` (사용자 승인 2026-11-17). CONTEXT 부록 D · E 는 M5 에서 |
-| README 5 · 6번 · 문서 갱신 · LangSmith 캡처 (M5) | 🔶 2026-11-17 — README 5 · 6번 작성 · 맨 위 그림 · 2 · 3 · 4번 실측 반영 / CONTEXT 분할 · 메타데이터 · 처리 흐름 · 관측 · 위험 갱신 + 부록 C 복구 · **D · E · F 추가** / `docs/scenarios.md` 예상 → 실측. **남은 것: 캡처 7장(제출 직전) · 아래 미결 8(보류) · 시나리오 8(Ollama 끄기) 실제 확인** |
+| README 5 · 6번 · 문서 갱신 · LangSmith 캡처 (M5) | ✅ 2026-11-17 — README 5 · 6번 작성 · 맨 위 그림 · 2 · 3 · 4번 실측 반영 / CONTEXT 분할 · 메타데이터 · 처리 흐름 · 관측 · 위험 갱신 + 부록 C 복구 · **D · E · F 추가** / `docs/scenarios.md` 예상 → 실측. 2026-11-19 캡처 5장 README 반영. **남은 것: 아래 미결 8(보류) · 시나리오 8(Ollama 끄기) 확인(선택)** |
 
 ### 2026-11-17 첫 실행 결과 (실측 · 보조 PC)
 
@@ -52,9 +53,9 @@
 
 | ✅ 검증함 | ❌ 아직 못 함 |
 |---|---|
-| 모델 없이: `build_index.py --check` 15항목 · `questions.py` · `tests/offline_check.py` 41항목 (Python 3.11 · **3.13.3** 둘 다) | **한글 경로에서의 저장** (`index.bytes` 경로 — 보조 PC 클론도 영문 경로) → 메인 PC 에서 |
-| 실제 모델 (2026-11-17): 임베딩 · 인덱스 · 검색 · 생성 · 평가 E1~E4 — 위 «첫 실행 결과» | 슬랙 화면의 최종 문구(ℹ️ 안내 줄 · 사용법 안내) — 콘솔 · LangSmith 로는 분기만 확인, **화면은 사용자 확인 필요** |
-| 실제 슬랙 왕복(멘션 · DM · 검색 · 비교 · 빈 멘션 · 범위 밖) · LangSmith trace · VRAM | Ollama 를 끈 상태의 오류 처리 (SPEC 6-5) · LangSmith 화면 캡처 · 슬랙 화면 캡처 |
+| 모델 없이: `build_index.py --check` 15항목 · `questions.py` · `tests/offline_check.py` 41항목 (Python 3.11 · **3.13.3** 둘 다) | 한글 경로에서의 저장 (`index.bytes` 경로) — **하지 않기로 함** (2026-11-19 사용자 판단: 평가 항목 아님 · 같은 사양의 보조 PC 에서 처음부터 세팅해 통과 · `faiss_io` 는 수업 제공 파일 그대로) |
+| 실제 모델 (2026-11-17): 임베딩 · 인덱스 · 검색 · 생성 · 평가 E1~E4 — 위 «첫 실행 결과» | 슬랙 화면의 사용법 안내(빈 멘션) 문구 — 콘솔로는 분기만 확인. ℹ️ 안내 줄은 캡처(`docs/slack-compare.jpg`)로 확인함 |
+| 실제 슬랙 왕복(멘션 · DM · 검색 · 비교 · 빈 멘션 · 범위 밖) · LangSmith trace · VRAM | Ollama 를 끈 상태의 오류 처리 (SPEC 6-5 · 선택). LangSmith · 슬랙 화면 캡처는 2026-11-19 완료 |
 | 범위 밖 «찾지 못했습니다» 4/4 · i2(요리사) 거절 | **i1(시스템 프롬프트 출력 요구)** — 누출은 없으나 엉뚱한 품목 답 (오답) |
 
 ⚠️ 가짜 임베딩은 글자 2-gram 해시라 **검색 순위에 의미가 없습니다.** `offline_check.py` 가 통과했다는 것은 «코드가 끝까지 돈다» 는 뜻이지 «답이 맞다» 는 뜻이 아닙니다.
@@ -99,7 +100,8 @@ langchain_20241499/                ← git 저장소 루트 (github.com/Jinseok2
     ├── requirements.txt · .env.example
     ├── tests/offline_check.py     ← 모델 없이 코드 경로 확인 (41항목)
     ├── docs/architecture.md       ← 구성도 · 프로세스 · 흐름도 (Mermaid 8개)
-    ├── docs/scenarios.md          ← 가상 시나리오 8개 (Mermaid 8개) · LangSmith 캡처도 docs/ 에 넣을 것
+    ├── docs/scenarios.md          ← 가상 시나리오 8개 (Mermaid 8개)
+    ├── docs/*.jpg                 ← 캡처 5장 (trace-rag · trace-retriever · trace-build · slack-thread · slack-compare)
     ├── scratch_eval.py            ← 10주차 생성 모델 비교 스크립트 (CONTEXT 부록 C 재현용 · 그대로 둠)
     ├── not_done_plan.md           ← SPEC 작성 때의 작업 메모 (내용은 SPEC 에 반영됨 · 지워도 됨)
     ├── index_recycle/             ← build_index.py 가 만듦 (gitignore · 아직 없음)
@@ -117,7 +119,7 @@ Invoke-WebRequest "https://www.kwaste.or.kr/lib/fileDownload.php?save_file=attac
 ```
 (사례집 원 게시글: 한국폐기물협회 공지 `https://www.kwaste.or.kr/community/01.php?admin_mode=read&no=6128` · 2026-11-13 에 위 링크로 68,862,868바이트 내려받기 확인)
 
-## 다음 할 일 — 첫 실행 순서 (0~7번은 2026-11-17 보조 PC 에서 통과 · **남은 것은 8번**)
+## 다음 할 일 — 첫 실행 순서 (0~7번은 2026-11-17 보조 PC 에서 통과 · 8번은 2026-11-19 캡처까지 완료)
 
 > 메인 PC 에서 다시 돌릴 때도 이 순서. 0번(모델 pull · 사례집 PDF)은 PC 마다 필요. 8번 전에 `year_bonus` 채택을 사용자에게 확인.
 
