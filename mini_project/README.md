@@ -51,12 +51,12 @@
 
 **실제 슬랙 화면** (2026-11-17 · RTX 3070 8GB PC 에서 봇 실행)
 
-![슬랙 스레드 — 질문 · 답 · 근거](docs/slack-thread.jpg)
+![슬랙 스레드 — 질문 · 답 · 근거](docs/slack-thread.png)
 
 오른쪽 스레드: «아이스팩 어떻게 버려?» → 답 + 📚 근거(품목 · 문서 · 연도 · 쪽) + 걸린 시간.
 왼쪽: 이날 슬랙에서 시험한 질문들 — 멘션 · `검색` · `비교` · 빈 멘션(사용법 안내) · 범위 밖(«강남구 재활용 요일?»).
 
-![비교 모드 — RAG 없이 vs RAG 로](docs/slack-compare.jpg)
+![비교 모드 — RAG 없이 vs RAG 로](docs/slack-compare.png)
 
 `비교`: RAG 없이(모델 기억만)는 «마트 영수증은 재활용이 가능한 경우가 많습니다» — **틀림** /
 RAG 로(문서에서 찾아서)는 «종량제 봉투로 배출해야 합니다» — **맞음** + 근거 3개.
@@ -172,7 +172,7 @@ ollama pull hf.co/mykor/KURE-v1-gguf:Q8_0              # 0.6 GB
 **① 슬랙 질문 1건 = trace 1건** — `recycle-rag` 아래 검색(`RecycleRetriever`)과 생성(`generate` → `ChatOllama`)이 나란히 있고,
 질문 · 답 · 근거 3개가 한 trace 에 남습니다. 위 슬랙 화면의 «아이스팩» 질문과 같은 것입니다.
 
-![trace — recycle-rag](docs/trace-rag.jpg)
+![trace — recycle-rag](docs/trace-rag.png)
 
 (기본값 `year_bonus 0.09` 를 정하기 전(15:25)에 물은 질문이라 화면에는 `year_bonus 0` 으로 나옵니다.)
 
@@ -180,12 +180,12 @@ ollama pull hf.co/mykor/KURE-v1-gguf:Q8_0              # 0.6 GB
 `item 아이스팩` · `source 분리배출_가이드라인.pdf` · `page 31` · `year 2018` · `doc_type item_dict` · `distance 0.5015`.
 슬랙 답의 출처 «아이스팩 · 가이드라인(2018) p.31» 은 모델이 쓰는 것이 아니라 **이 metadata 로 코드가 만듭니다.**
 
-![trace — RecycleRetriever](docs/trace-retriever.jpg)
+![trace — RecycleRetriever](docs/trace-retriever.png)
 
 **③ 전처리도 추적** — 인덱스를 만들 때(`build-chunks` · `mode structure`) 정리(`clean-pages`)와
 구역별 분할(`split-guideline` · `split-faq` · `split-item-dict` · `split-qa-cases`)이 run 으로 남고, 결과는 `count 456` 청크.
 
-![trace — build-chunks](docs/trace-build.jpg)
+![trace — build-chunks](docs/trace-build.png)
 
 ## 5. 실행 방법
 
@@ -360,5 +360,5 @@ Bolt app is running!
 - [x] 최종 산출물(코드) — 실제 모델 · 실제 슬랙으로 확인 (2026-11-17)
 - [x] 평가 E1 ~ E4 실측 → 기본값 채택 (`eval_results/` · CONTEXT 부록 D · E)
 - [x] `README.md` 6항목
-- [x] ★★ **LangSmith 추적 캡처(필수)** — 4번 «LangSmith 추적 캡처» 3장 (`docs/trace-*.jpg` · 보존 14일이라 이미지로 저장)
-- [x] 슬랙 대화 화면 캡처 — 2번 «실제 슬랙 화면» 2장 (`docs/slack-*.jpg`)
+- [x] ★★ **LangSmith 추적 캡처(필수)** — 4번 «LangSmith 추적 캡처» 3장 (`docs/trace-*.png` · 보존 14일이라 이미지로 저장)
+- [x] 슬랙 대화 화면 캡처 — 2번 «실제 슬랙 화면» 2장 (`docs/slack-*.png`)

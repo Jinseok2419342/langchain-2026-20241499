@@ -14,7 +14,7 @@
 > ★ **2026-11-17 에 실제 모델로 처음 돌렸습니다** — 메인 PC 와 사양이 같은 보조 PC(RTX 3070 8GB · Ollama 0.32.14 · Python 3.13.3 · 영문 경로 클론).
 > 인덱스 생성 → 터미널 → 슬랙(멘션 · DM) → LangSmith → 평가 E1~E4 까지 통과. 아래 «2026-11-17 첫 실행 결과» 참고.
 > 기본값 채택(`basic` · `year_bonus 0.09` · `base`)과 문서 갱신(README 5 · 6 · CONTEXT 부록 D ~ F · scenarios)까지 끝났습니다.
-> ★ **2026-11-19 캡처 5장을 README 에 넣음** (LangSmith 3장 · 슬랙 2장 · `docs/*.jpg` · SPEC 13-1 l) → 수업 PDF 필수 요건 전부 충족.
+> ★ **2026-11-19 캡처 5장을 README 에 넣음** (LangSmith 3장 · 슬랙 2장 · `docs/*.png` · SPEC 13-1 l) → 수업 PDF 필수 요건 전부 충족.
 > **남은 것: 미결 8 (사용자가 보류) · 시나리오 8(Ollama 끈 상태) 실제 확인 (선택).**
 
 | 단계 | 상태 |
@@ -54,7 +54,7 @@
 | ✅ 검증함 | ❌ 아직 못 함 |
 |---|---|
 | 모델 없이: `build_index.py --check` 15항목 · `questions.py` · `tests/offline_check.py` 41항목 (Python 3.11 · **3.13.3** 둘 다) | 한글 경로에서의 저장 (`index.bytes` 경로) — **하지 않기로 함** (2026-11-19 사용자 판단: 평가 항목 아님 · 같은 사양의 보조 PC 에서 처음부터 세팅해 통과 · `faiss_io` 는 수업 제공 파일 그대로) |
-| 실제 모델 (2026-11-17): 임베딩 · 인덱스 · 검색 · 생성 · 평가 E1~E4 — 위 «첫 실행 결과» | 슬랙 화면의 사용법 안내(빈 멘션) 문구 — 콘솔로는 분기만 확인. ℹ️ 안내 줄은 캡처(`docs/slack-compare.jpg`)로 확인함 |
+| 실제 모델 (2026-11-17): 임베딩 · 인덱스 · 검색 · 생성 · 평가 E1~E4 — 위 «첫 실행 결과» | 슬랙 화면의 사용법 안내(빈 멘션) 문구 — 콘솔로는 분기만 확인. ℹ️ 안내 줄은 캡처(`docs/slack-compare.png`)로 확인함 |
 | 실제 슬랙 왕복(멘션 · DM · 검색 · 비교 · 빈 멘션 · 범위 밖) · LangSmith trace · VRAM | Ollama 를 끈 상태의 오류 처리 (SPEC 6-5 · 선택). LangSmith · 슬랙 화면 캡처는 2026-11-19 완료 |
 | 범위 밖 «찾지 못했습니다» 4/4 · i2(요리사) 거절 | **i1(시스템 프롬프트 출력 요구)** — 누출은 없으나 엉뚱한 품목 답 (오답) |
 
@@ -101,7 +101,7 @@ langchain_20241499/                ← git 저장소 루트 (github.com/Jinseok2
     ├── tests/offline_check.py     ← 모델 없이 코드 경로 확인 (41항목)
     ├── docs/architecture.md       ← 구성도 · 프로세스 · 흐름도 (Mermaid 8개)
     ├── docs/scenarios.md          ← 가상 시나리오 8개 (Mermaid 8개)
-    ├── docs/*.jpg                 ← 캡처 5장 (trace-rag · trace-retriever · trace-build · slack-thread · slack-compare)
+    ├── docs/*.png                 ← 캡처 5장 (trace-rag · trace-retriever · trace-build · slack-thread · slack-compare)
     ├── scratch_eval.py            ← 10주차 생성 모델 비교 스크립트 (CONTEXT 부록 C 재현용 · 그대로 둠)
     ├── not_done_plan.md           ← SPEC 작성 때의 작업 메모 (내용은 SPEC 에 반영됨 · 지워도 됨)
     ├── index_recycle/             ← build_index.py 가 만듦 (gitignore · 아직 없음)

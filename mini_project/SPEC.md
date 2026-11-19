@@ -1186,7 +1186,7 @@ CONTEXT «범위 밖» 9항목은 그대로 유효합니다. 구현 중 유혹�
 | i | 6-2절 근거 줄 | 같은 출처가 겹치면 **한 번만** 표시 | 본문 청크 둘이 같은 쪽 · 같은 소절이면 출처 문자열이 같음 |
 | j | 6-1절 검색 모드 | trace 이름 `recycle-search` · 태그 `search` 로 추적에 남김 | 검색 모드도 슬랙 입력이라 |
 | k | 4장 저장 `FAISS.from_documents(chunks, …)` 한 번 | `EMBED_BATCH = 64` 개씩 — 첫 묶음 `from_documents` 뒤 `add_documents` (2026-11-17) | 456청크를 한 요청에 보내면 Ollama 0.32.14 러너가 간헐적으로 죽음(`…/tokenize: connection refused` · 3회 중 2회). 64개씩은 3회 모두 성공 · 결과 벡터 동일 |
-| l | 8-2절 캡처 7장 PNG · 제출 직전에 새 trace 로 | **5장 JPG** (2026-11-19 · 11-17 trace 와 슬랙 화면): `trace-rag` · `trace-retriever` · `trace-build` · `slack-thread` · `slack-compare`. MultiQuery(미채택) · metadata 탭(슬랙 ID 노출) 캡처는 뺌, 비교는 LangSmith 목록 대신 슬랙 `비교` 스레드로 | 이미지는 보존 기간과 상관없어 지금 찍어도 됨 · 사용자 결정. README 2번(슬랙) · 4번(LangSmith) 에 넣음 |
+| l | 8-2절 캡처 7장 PNG · 제출 직전에 새 trace 로 | **5장 PNG 원본** (2026-11-19 · 11-17 trace 와 슬랙 화면): `trace-rag` · `trace-retriever` · `trace-build` · `slack-thread` · `slack-compare`. MultiQuery(미채택) · metadata 탭(슬랙 ID 노출) 캡처는 뺌, 비교는 LangSmith 목록 대신 슬랙 `비교` 스레드로 | 이미지는 보존 기간과 상관없어 지금 찍어도 됨 · 사용자 결정. README 2번(슬랙) · 4번(LangSmith) 에 넣음 |
 
 **검증한 것 / 못 한 것**
 

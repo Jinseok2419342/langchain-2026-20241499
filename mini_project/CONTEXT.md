@@ -157,7 +157,7 @@
   루트 `.env` 에는 `LANGSMITH_TRACING=true` 와 API 키만 둡니다.
 - ✅ 2026-11-17 확인 — `recycle-rag` · `recycle-plain` · `recycle-search` · `build-chunks` trace 와 태그 · `slack_user` metadata 가 실제로 남음
 - ✅ 캡처 (2026-11-19 · 11-17 trace) — `recycle-rag` 트리 · `RecycleRetriever` 의 근거와 metadata · `build-chunks`(정리 `clean-pages` → 구역별 `split-*` → 456청크) 3장을 README 4번에 넣음.
-  무료 플랜 보존 14일이라 링크 대신 이미지(`docs/trace-*.jpg`)로 저장
+  무료 플랜 보존 14일이라 링크 대신 이미지(`docs/trace-*.png`)로 저장
 
 ---
 
